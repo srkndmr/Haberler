@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  macOS launchd: pipeline'ı her gün 07:00'de çalıştırır.
+  Kurulum:
+    cp com.haberler.pipeline.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.haberler.pipeline.plist
+  Durdurma:
+    launchctl unload ~/Library/LaunchAgents/com.haberler.pipeline.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.haberler.pipeline</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/sh</string>
+        <string>/Users/apple/Haberler/n8n/scheduler/run-daily.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>7</integer>
+        <key>Minute</key><integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/apple/Haberler/n8n/scheduler/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/apple/Haberler/n8n/scheduler/launchd.err.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

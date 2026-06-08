@@ -6,3 +6,6 @@ ornek-payload.json
 wp/.app_password
 .env
 .env.local
+# Scheduler sırları + loglar
+n8n/scheduler/.env
+n8n/scheduler/*.log
