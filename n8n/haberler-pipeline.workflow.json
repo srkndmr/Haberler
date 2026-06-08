@@ -1,0 +1,210 @@
+{
+  "id": "haberler-pipeline",
+  "active": false,
+  "name": "Haberler — Doğruluk Denetimi Pipeline (iskelet)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": { "interval": [ { "field": "days", "triggerAtHour": 7 } ] }
+      },
+      "id": "node-schedule",
+      "name": "1 · Schedule (günlük 07:00)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [ -1120, 300 ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"kaynaklar\": [\n    { \"ad\": \"Sözcü\", \"ana_url\": \"https://www.sozcu.com.tr\", \"rss_url\": \"https://www.sozcu.com.tr/feeds-rss-category-sozcu\", \"yontem\": \"rss\" },\n    { \"ad\": \"Hürriyet\", \"ana_url\": \"https://www.hurriyet.com.tr\", \"rss_url\": \"https://www.hurriyet.com.tr/rss/anasayfa\", \"yontem\": \"rss\" },\n    { \"ad\": \"Milliyet\", \"ana_url\": \"https://www.milliyet.com.tr\", \"rss_url\": \"https://www.milliyet.com.tr/rss/rssNew/gundemRss.xml\", \"yontem\": \"rss\" },\n    { \"ad\": \"Habertürk\", \"ana_url\": \"https://www.haberturk.com\", \"rss_url\": \"https://www.haberturk.com/rss\", \"yontem\": \"rss\" },\n    { \"ad\": \"Sabah\", \"ana_url\": \"https://www.sabah.com.tr\", \"rss_url\": \"https://www.sabah.com.tr/rss/anasayfa.xml\", \"yontem\": \"rss\" },\n    { \"ad\": \"Cumhuriyet\", \"ana_url\": \"https://www.cumhuriyet.com.tr\", \"rss_url\": \"https://www.cumhuriyet.com.tr/rss\", \"yontem\": \"rss\" },\n    { \"ad\": \"Yeni Şafak\", \"ana_url\": \"https://www.yenisafak.com\", \"rss_url\": \"https://www.yenisafak.com/rss?xml=anasayfa\", \"yontem\": \"rss\" },\n    { \"ad\": \"Star\", \"ana_url\": \"https://www.star.com.tr\", \"rss_url\": \"https://www.star.com.tr/rss/rss.asp\", \"yontem\": \"rss\" },\n    { \"ad\": \"NTV\", \"ana_url\": \"https://www.ntv.com.tr\", \"rss_url\": \"https://www.ntv.com.tr/gundem.rss\", \"yontem\": \"rss\" },\n    { \"ad\": \"Haberler.com\", \"ana_url\": \"https://www.haberler.com\", \"rss_url\": \"\", \"yontem\": \"scrape\" },\n    { \"ad\": \"Ensonhaber\", \"ana_url\": \"https://www.ensonhaber.com\", \"rss_url\": \"\", \"yontem\": \"scrape\" },\n    { \"ad\": \"Mynet\", \"ana_url\": \"https://www.mynet.com\", \"rss_url\": \"\", \"yontem\": \"scrape\" }\n  ]\n}"
+      },
+      "id": "node-kaynaklar",
+      "name": "2 · Set: Kaynak Listesi",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [ -900, 300 ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "kaynaklar",
+        "options": {}
+      },
+      "id": "node-split",
+      "name": "3 · Split Out (kaynaklar)",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [ -700, 300 ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false, "version": 2 },
+          "conditions": [
+            { "leftValue": "={{ $json.yontem }}", "rightValue": "rss", "operator": { "type": "string", "operation": "equals" } }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "node-if-yontem",
+      "name": "4 · IF: rss mi scrape mi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [ -500, 300 ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.rss_url }}",
+        "options": {}
+      },
+      "id": "node-rss",
+      "name": "4a · RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [ -280, 180 ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.ana_url }}",
+        "options": {}
+      },
+      "id": "node-http-scrape",
+      "name": "4b · HTTP Request (scrape)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ -280, 420 ],
+      "notes": "Dönen HTML'i bir sonraki HTML Extract / Code node ile başlık+link+özet'e ayır."
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "id": "node-merge",
+      "name": "5 · Merge (rss + scrape)",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [ -60, 300 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 6 · Anahtar kelime filtresi (FETÖ konusu) — genişletilebilir\nconst ANAHTAR = [\"fetö\",\"feto\",\"fethullahçı\",\"fetullahçı\",\"gülen\",\"gulen\",\"bylock\",\"15 temmuz\",\"darbe girişimi\",\"paralel yapı\"];\nconst HARIC = [];\nreturn items.filter(({ json }) => {\n  const m = `${json.title||json.baslik||\"\"} ${json.contentSnippet||json.ozet||\"\"} ${json.content||json.icerik||\"\"}`.toLowerCase();\n  return ANAHTAR.some(k=>m.includes(k)) && !HARIC.some(k=>m.includes(k));\n});"
+      },
+      "id": "node-keyword",
+      "name": "6 · Code: Anahtar Kelime Filtresi",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 160, 300 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 7 · URL bazında tam tekrar kontrolü (statik veri — hızlı başlangıç)\nconst store = $getWorkflowStaticData('global');\nstore.gorulenUrller = store.gorulenUrller || {};\nconst yeni = [];\nfor (const item of items) {\n  const u = (item.json.link || item.json.orijinal_url || \"\").trim();\n  if (!u) continue;\n  if (store.gorulenUrller[u]) continue;\n  store.gorulenUrller[u] = Date.now();\n  item.json.orijinal_url = u;\n  yeni.push(item);\n}\nreturn yeni;"
+      },
+      "id": "node-dedup",
+      "name": "7 · Code: URL Tekrar Kontrolü",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 380, 300 ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 8 · Story clustering: aynı olayı tek dosyada grupla (tekrarları SİLME, kaynak ekle)\nfunction tokens(s){return (s||\"\").toLowerCase().replace(/[^a-z0-9çğıöşü ]/g,\" \").split(/\\s+/).filter(w=>w.length>3);}\nfunction jaccard(a,b){const A=new Set(a),B=new Set(b);const k=[...A].filter(x=>B.has(x)).length;return k/((A.size+B.size-k)||1);}\nconst ESIK=0.45; const kumeler=[];\nfor (const it of items){\n  const j=it.json;\n  const t=tokens(`${j.title||j.baslik} ${j.contentSnippet||j.ozet}`);\n  let yer=false;\n  for (const k of kumeler){ if (jaccard(t,k.tokens)>=ESIK){ k.kaynaklar.push({kaynak_adi:j.kaynak_adi||j.ad,orijinal_url:j.orijinal_url,yayin_tarihi:j.isoDate||j.yayin_tarihi}); yer=true; break; } }\n  if(!yer) kumeler.push({tokens:t,baslik:j.title||j.baslik,icerik:j.content||j.icerik||j.contentSnippet||\"\",kaynaklar:[{kaynak_adi:j.kaynak_adi||j.ad,orijinal_url:j.orijinal_url,yayin_tarihi:j.isoDate||j.yayin_tarihi}]});\n}\nreturn kumeler.map(k=>({json:{baslik:k.baslik,icerik:k.icerik,kaynaklar:k.kaynaklar}}));"
+      },
+      "id": "node-cluster",
+      "name": "8 · Code: Story Clustering",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 600, 300 ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://web.archive.org/save/{{ $json.kaynaklar[0].orijinal_url }}",
+        "options": { "redirect": { "redirect": {} } }
+      },
+      "id": "node-archive",
+      "name": "9 · HTTP: web.archive.org snapshot",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 820, 300 ],
+      "notes": "Continue On Fail = ON. Dönen Content-Location'ı arsiv_url olarak taşı."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-3-5-haiku-latest\",\n  \"max_tokens\": 2000,\n  \"temperature\": 0,\n  \"system\": \"<<< prompts/ai-analiz-sistem-promptu.md içeriğini buraya yapıştır >>>\",\n  \"messages\": [\n    { \"role\": \"user\", \"content\": {{ JSON.stringify('BAŞLIK: ' + $json.baslik + '\\n\\nMETİN:\\n' + $json.icerik + '\\n\\nKAYNAKLAR: ' + JSON.stringify($json.kaynaklar)) }} }\n  ]\n}",
+        "options": {}
+      },
+      "id": "node-anthropic",
+      "name": "10 · Anthropic (Claude) Analiz",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 1040, 300 ],
+      "notes": "Credentials: 'Anthropic Claude' Header Auth (x-api-key). Retry On Fail = ON (3x). Yanıt: content[0].text = KATI JSON."
+    },
+    {
+      "parameters": {
+        "jsCode": "// 11 · AI çıktısını doğrula + WP REST payload üret (güvenli varsayılanlar)\nconst out=[];\nfor (const it of items){\n  const ham = it.json?.content?.[0]?.text ?? it.json.ai_text ?? \"\";\n  let a=null; try{ a=JSON.parse(ham);}catch(e){ a=null; }\n  const gecerli=new Set([\"dogru\",\"kismen_dogru\",\"yanlis\",\"dogrulanamaz\",\"gorus\"]);\n  const iddialar=(a?.iddialar||[]).map(x=>({iddia_metni:String(x.iddia_metni||\"\").slice(0,2000),siniflandirma:gecerli.has(x.siniflandirma)?x.siniflandirma:\"dogrulanamaz\",gerekce:String(x.gerekce||\"\"),dayanak_kaynak_url:x.dayanak_kaynak_url||\"\"}));\n  const isim = a?.isim_verilen_suclama===\"hayir\"?\"hayir\":\"evet\"; // emin değilsek hukuk kapısını AÇ\n  out.push({json:{ title:(it.json.baslik||a?.ozet||\"Başlıksız dosya\").slice(0,120), status:\"draft\", content:\"Otomatik üretilmiş TASLAK — editör/hukuk incelemesi bekliyor.\", meta:{ haberler_ozet:a?.ozet||\"\", haberler_isim_verilen_suclama:isim, haberler_isim_suclama_gerekce:a?.isim_verilen_suclama_gerekce||\"\", haberler_kaynaklar:JSON.stringify(it.json.kaynaklar||[]), haberler_iddialar:JSON.stringify(iddialar) } }});\n}\nreturn out;"
+      },
+      "id": "node-payload",
+      "name": "11 · Code: JSON Parse + ACF Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [ 1260, 300 ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ALANADI/wp-json/wp/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "node-wp",
+      "name": "12 · HTTP: WP REST (status=draft)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [ 1480, 300 ],
+      "notes": "Credentials: 'WP pipeline-bot' Header Auth (Basic). status HER ZAMAN draft — asla publish."
+    },
+    {
+      "parameters": {
+        "content": "## Haberler Pipeline — İSKELET\n\nBu workflow içe aktarıldıktan sonra ELLE tamamlanacak adımlar:\n\n1. Node 4a/4b: RSS + scrape dallarını Merge'e bağla; scrape için HTML Extract ekle.\n2. Node 9: Continue On Fail = ON; arsiv_url'i çıktıya taşı.\n3. Node 10: Anthropic credential'ı bağla, system prompt'u yapıştır, Retry On Fail = ON.\n4. Node 12: WP credential'ı bağla, ALANADI'yı değiştir.\n\nDEĞİŞMEZ: status her zaman 'draft'. Hiçbir yerde 'publish' yok.\nKimlik bilgileri yalnızca n8n Credentials'ta — bu dosyada anahtar YOK.",
+        "height": 320,
+        "width": 380
+      },
+      "id": "node-sticky",
+      "name": "Açıklama",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [ -1120, -120 ]
+    }
+  ],
+  "connections": {
+    "1 · Schedule (günlük 07:00)": { "main": [ [ { "node": "2 · Set: Kaynak Listesi", "type": "main", "index": 0 } ] ] },
+    "2 · Set: Kaynak Listesi": { "main": [ [ { "node": "3 · Split Out (kaynaklar)", "type": "main", "index": 0 } ] ] },
+    "3 · Split Out (kaynaklar)": { "main": [ [ { "node": "4 · IF: rss mi scrape mi?", "type": "main", "index": 0 } ] ] },
+    "4 · IF: rss mi scrape mi?": { "main": [ [ { "node": "4a · RSS Read", "type": "main", "index": 0 } ], [ { "node": "4b · HTTP Request (scrape)", "type": "main", "index": 0 } ] ] },
+    "4a · RSS Read": { "main": [ [ { "node": "5 · Merge (rss + scrape)", "type": "main", "index": 0 } ] ] },
+    "4b · HTTP Request (scrape)": { "main": [ [ { "node": "5 · Merge (rss + scrape)", "type": "main", "index": 1 } ] ] },
+    "5 · Merge (rss + scrape)": { "main": [ [ { "node": "6 · Code: Anahtar Kelime Filtresi", "type": "main", "index": 0 } ] ] },
+    "6 · Code: Anahtar Kelime Filtresi": { "main": [ [ { "node": "7 · Code: URL Tekrar Kontrolü", "type": "main", "index": 0 } ] ] },
+    "7 · Code: URL Tekrar Kontrolü": { "main": [ [ { "node": "8 · Code: Story Clustering", "type": "main", "index": 0 } ] ] },
+    "8 · Code: Story Clustering": { "main": [ [ { "node": "9 · HTTP: web.archive.org snapshot", "type": "main", "index": 0 } ] ] },
+    "9 · HTTP: web.archive.org snapshot": { "main": [ [ { "node": "10 · Anthropic (Claude) Analiz", "type": "main", "index": 0 } ] ] },
+    "10 · Anthropic (Claude) Analiz": { "main": [ [ { "node": "11 · Code: JSON Parse + ACF Payload", "type": "main", "index": 0 } ] ] },
+    "11 · Code: JSON Parse + ACF Payload": { "main": [ [ { "node": "12 · HTTP: WP REST (status=draft)", "type": "main", "index": 0 } ] ] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "pinData": {}
+}

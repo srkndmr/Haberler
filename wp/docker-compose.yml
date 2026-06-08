@@ -1,0 +1,80 @@
+# Yerel test ortamı: WordPress + MariaDB + WP-CLI
+# Kullanım:
+#   docker compose up -d
+#   docker compose run --rm wpcli /build/setup.sh
+#   → http://localhost:8080/wp-admin  (yonetici / yonetici-parola)
+name: haberler
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: haberler
+      MARIADB_USER: haberler
+      MARIADB_PASSWORD: haberler
+      MARIADB_ROOT_PASSWORD: rootpass
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  wordpress:
+    image: wordpress:php8.3-apache
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8091:80"
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: haberler
+      WORDPRESS_DB_USER: haberler
+      WORDPRESS_DB_PASSWORD: haberler
+      WORDPRESS_DEBUG: 1
+      # YEREL test: Application Password'ler HTTP üzerinde yalnızca 'local' ortamda
+      # çalışır. PHP getenv() bunu okur. PROD'da HTTPS olduğundan bu satıra GEREK YOK.
+      WP_ENVIRONMENT_TYPE: local
+    volumes:
+      - wp_data:/var/www/html
+      - ./mu-plugins:/var/www/html/wp-content/mu-plugins
+
+  wpcli:
+    image: wordpress:cli-php8.3
+    depends_on:
+      wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_NAME: haberler
+      WORDPRESS_DB_USER: haberler
+      WORDPRESS_DB_PASSWORD: haberler
+      WP_ENVIRONMENT_TYPE: local
+    volumes:
+      - wp_data:/var/www/html
+      - ./mu-plugins:/var/www/html/wp-content/mu-plugins
+      - ./:/build
+    entrypoint: ["sh"]
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      GENERIC_TIMEZONE: Europe/Istanbul
+      N8N_SECURE_COOKIE: "false"
+      N8N_RUNNERS_ENABLED: "true"
+      WEBHOOK_URL: "http://localhost:5678/"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ../n8n:/workflows
+
+volumes:
+  db_data:
+  wp_data:
+  n8n_data:

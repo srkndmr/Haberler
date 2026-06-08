@@ -1,0 +1,8 @@
+.DS_Store
+*.log
+ornek-payload.json
+# Otomatik üretilen sırlar / yerel ortam
+.app_password
+wp/.app_password
+.env
+.env.local

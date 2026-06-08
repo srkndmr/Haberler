@@ -1,0 +1,162 @@
+[
+  {
+    "key": "group_haberler_dosya",
+    "title": "Dosya",
+    "fields": [
+      {
+        "key": "field_dosya_ozet",
+        "label": "Özet (editör)",
+        "name": "ozet",
+        "type": "wysiwyg",
+        "instructions": "Dosyanın insan tarafından gözden geçirilmiş kısa özeti. AI taslağı buraya gelir; editör düzenler.",
+        "required": 0,
+        "tabs": "all",
+        "toolbar": "basic",
+        "media_upload": 0
+      },
+      {
+        "key": "field_dosya_isim_verilen_suclama",
+        "label": "İsim verilen suçlama var mı?",
+        "name": "isim_verilen_suclama",
+        "type": "radio",
+        "instructions": "Belirli bir kişi/kurum ismi + ağır niteleme (iftira, yalan haber, suç isnadı vb.) birlikte geçiyorsa 'Evet'. Bu alan 'Evet' ise dosya, zorunlu Hukuk İncelemesi olmadan Yayına Hazır'a GEÇEMEZ.",
+        "required": 1,
+        "choices": { "evet": "Evet", "hayir": "Hayır" },
+        "default_value": "hayir",
+        "layout": "horizontal",
+        "return_format": "value"
+      },
+      {
+        "key": "field_dosya_isim_suclama_gerekce",
+        "label": "İsim verilen suçlama — gerekçe",
+        "name": "isim_verilen_suclama_gerekce",
+        "type": "textarea",
+        "instructions": "Hangi isim ve hangi niteleme nedeniyle hukuk kapısı tetiklendi? (Hukukçu için not.)",
+        "required": 0,
+        "rows": 3,
+        "conditional_logic": [
+          [ { "field": "field_dosya_isim_verilen_suclama", "operator": "==", "value": "evet" } ]
+        ]
+      },
+      {
+        "key": "field_dosya_kaynaklar",
+        "label": "Kaynaklar (mecra / URL)",
+        "name": "kaynaklar",
+        "type": "repeater",
+        "instructions": "Aynı iddiayı/olayı yayınlayan TÜM mecralar burada satır satır toplanır (story clustering). Bir dosya birden çok mecra/URL tutabilir.",
+        "required": 1,
+        "min": 1,
+        "layout": "block",
+        "button_label": "Kaynak ekle",
+        "sub_fields": [
+          {
+            "key": "field_kaynak_adi",
+            "label": "Kaynak adı",
+            "name": "kaynak_adi",
+            "type": "text",
+            "required": 1
+          },
+          {
+            "key": "field_orijinal_url",
+            "label": "Orijinal URL",
+            "name": "orijinal_url",
+            "type": "url",
+            "required": 1
+          },
+          {
+            "key": "field_yayin_tarihi",
+            "label": "Yayın tarihi",
+            "name": "yayin_tarihi",
+            "type": "date_picker",
+            "display_format": "d/m/Y",
+            "return_format": "Y-m-d",
+            "first_day": 1
+          },
+          {
+            "key": "field_arsiv_url",
+            "label": "Arşiv URL (web.archive.org)",
+            "name": "arsiv_url",
+            "type": "url",
+            "instructions": "Kaynak silinirse kanıt kalsın diye snapshot linki."
+          },
+          {
+            "key": "field_ekran_goruntusu",
+            "label": "Ekran görüntüsü",
+            "name": "ekran_goruntusu",
+            "type": "image",
+            "return_format": "url",
+            "preview_size": "medium",
+            "library": "all"
+          }
+        ]
+      },
+      {
+        "key": "field_dosya_iddialar",
+        "label": "İddialar",
+        "name": "iddialar",
+        "type": "repeater",
+        "instructions": "Haber içindeki her somut iddia ayrı satır. Her iddia kanıta karşı sınıflandırılır; gerekçe ve dayanak kaynak zorunludur.",
+        "required": 0,
+        "min": 0,
+        "layout": "block",
+        "button_label": "İddia ekle",
+        "sub_fields": [
+          {
+            "key": "field_iddia_metni",
+            "label": "İddia metni",
+            "name": "iddia_metni",
+            "type": "textarea",
+            "required": 1,
+            "rows": 2
+          },
+          {
+            "key": "field_iddia_siniflandirma",
+            "label": "Sınıflandırma",
+            "name": "siniflandirma",
+            "type": "select",
+            "required": 1,
+            "choices": {
+              "dogru": "Doğru",
+              "kismen_dogru": "Kısmen doğru",
+              "yanlis": "Yanlış",
+              "dogrulanamaz": "Doğrulanamaz",
+              "gorus": "Görüş"
+            },
+            "default_value": "dogrulanamaz",
+            "return_format": "value",
+            "allow_null": 0,
+            "multiple": 0,
+            "ui": 1
+          },
+          {
+            "key": "field_iddia_gerekce",
+            "label": "Gerekçe",
+            "name": "gerekce",
+            "type": "textarea",
+            "required": 1,
+            "rows": 3
+          },
+          {
+            "key": "field_iddia_dayanak_url",
+            "label": "Dayanak kaynak URL",
+            "name": "dayanak_kaynak_url",
+            "type": "url",
+            "instructions": "Sınıflandırmanın dayandığı kanıt/kaynak. 'doğrulanamaz' veya 'görüş' ise boş bırakılabilir."
+          }
+        ]
+      }
+    ],
+    "location": [
+      [ { "param": "post_type", "operator": "==", "value": "post" } ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": "",
+    "active": true,
+    "description": "Doğruluk denetimi dosyası: kaynaklar (çoklu mecra), iddialar + sınıflandırma, hukuk kapısı.",
+    "show_in_rest": 1
+  }
+]
