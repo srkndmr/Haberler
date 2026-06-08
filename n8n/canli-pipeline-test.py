@@ -65,7 +65,7 @@ def analyze_with_claude(item, api_key):
         '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}'
     )
     body = json.dumps({
-        "model": "claude-3-5-haiku-latest",
+        "model": os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
         "max_tokens": 1500, "temperature": 0,
         "system": sys_prompt,
         "messages": [{"role": "user", "content": f"BAŞLIK: {item['baslik']}\n\nÖZET: {item['ozet']}"}],
@@ -74,7 +74,12 @@ def analyze_with_claude(item, api_key):
         "x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
     with urllib.request.urlopen(req, timeout=60) as r:
         data = json.loads(r.read())
-    return json.loads(data["content"][0]["text"])
+    text = data["content"][0]["text"]
+    # Model bazen ```json ... ``` ile sarar; ilk { ile son } arasını al.
+    m = re.search(r"\{.*\}", text, re.DOTALL)
+    if not m:
+        raise ValueError("yanıtta JSON bulunamadı")
+    return json.loads(m.group(0))
 
 def safe_default(item):
     return {"ozet": item["ozet"][:400], "iddialar": [],

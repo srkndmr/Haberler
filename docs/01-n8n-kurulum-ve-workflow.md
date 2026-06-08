@@ -208,8 +208,9 @@ Her `orijinal_url` için web.archive.org snapshot tetikle:
 ### 3.6 — Node 10: Anthropic (Claude) analiz
 
 - **Anthropic node** (veya HTTP Request → `https://api.anthropic.com/v1/messages`).
-- Model: `claude-3-5-haiku-latest` (ucuz, hızlı) ya da daha titiz analiz için
-  `claude-sonnet-4-5` / güncel Sonnet.
+- Model: `claude-haiku-4-5-20251001` (ucuz, hızlı — canlı testte kullanıldı) ya da daha
+  titiz analiz için `claude-sonnet-4-6`. Hesabında geçerli model adlarını
+  `GET https://api.anthropic.com/v1/models` ile doğrula (eski `claude-3-5-*` adları 404 verebilir).
 - **System prompt:** `prompts/ai-analiz-sistem-promptu.md` içeriğini yapıştır.
 - **User mesajı:** kümelenmiş haberin başlığı + tam metni + kaynak listesi.
 - **Çıktı:** katı JSON (markdown/önsöz yok). `temperature: 0`, `max_tokens: 2000`.

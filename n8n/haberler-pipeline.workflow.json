@@ -139,7 +139,7 @@
         "headerParameters": { "parameters": [ { "name": "anthropic-version", "value": "2023-06-01" } ] },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"model\": \"claude-3-5-haiku-latest\",\n  \"max_tokens\": 2000,\n  \"temperature\": 0,\n  \"system\": \"<<< prompts/ai-analiz-sistem-promptu.md içeriğini buraya yapıştır >>>\",\n  \"messages\": [\n    { \"role\": \"user\", \"content\": {{ JSON.stringify('BAŞLIK: ' + $json.baslik + '\\n\\nMETİN:\\n' + $json.icerik + '\\n\\nKAYNAKLAR: ' + JSON.stringify($json.kaynaklar)) }} }\n  ]\n}",
+        "jsonBody": "={\n  \"model\": \"claude-haiku-4-5-20251001\",\n  \"max_tokens\": 2000,\n  \"temperature\": 0,\n  \"system\": \"<<< prompts/ai-analiz-sistem-promptu.md içeriğini buraya yapıştır >>>\",\n  \"messages\": [\n    { \"role\": \"user\", \"content\": {{ JSON.stringify('BAŞLIK: ' + $json.baslik + '\\n\\nMETİN:\\n' + $json.icerik + '\\n\\nKAYNAKLAR: ' + JSON.stringify($json.kaynaklar)) }} }\n  ]\n}",
         "options": {}
       },
       "id": "node-anthropic",
