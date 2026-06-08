@@ -134,18 +134,31 @@ def main():
 
     print(f"Toplam {len(all_items)} haber. Anahtar kelime filtresi uygulanıyor...")
     matched = keyword_filter(all_items)
-    # URL dedup
+
+    # Kalıcı URL dedup: daha önce işlenen URL'ler state dosyasında tutulur,
+    # böylece günlük çalıştırmalar aynı haberi tekrar tekrar TASLAK YAPMAZ.
+    state_path = os.environ.get("STATE_FILE",
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "scheduler", "seen-urls.txt"))
+    processed = set()
+    if os.path.exists(state_path):
+        with open(state_path, encoding="utf-8") as fh:
+            processed = {ln.strip() for ln in fh if ln.strip()}
+
     seen, uniq = set(), []
     for it in matched:
-        if it["orijinal_url"] and it["orijinal_url"] not in seen:
-            seen.add(it["orijinal_url"]); uniq.append(it)
-    print(f"Konuyla eşleşen (dedup sonrası): {len(uniq)}")
+        u = it["orijinal_url"]
+        if u and u not in seen and u not in processed:
+            seen.add(u); uniq.append(it)
+    skipped = len(matched) - len(uniq)
+    print(f"Konuyla eşleşen: {len(matched)} | yeni (işlenecek): {len(uniq)} | "
+          f"daha önce işlenmiş (atlandı): {skipped}")
 
     if not uniq:
         print("Bugünkü feed'lerde konuyla eşleşen haber yok. (Filtre doğru çalışıyor — uydurma yok.)")
         return
 
     limit = int(os.environ.get("LIMIT", "2"))
+    os.makedirs(os.path.dirname(state_path), exist_ok=True)
     for it in uniq[:limit]:
         print(f"\n-> İşleniyor: {it['baslik'][:70]}")
         if api:
@@ -157,6 +170,9 @@ def main():
             analiz = safe_default(it); print("   AI anahtarı yok -> güvenli varsayılan (iddialar boş, hukuk kapısı açık)")
         res = wp_create_draft(it, analiz, wp_url, user, app)
         print(f"   WP taslak oluşturuldu: ID={res.get('id')} status={res.get('status')}")
+        # Başarılı taslak sonrası URL'yi kalıcı olarak işaretle (mükerrer önleme)
+        with open(state_path, "a", encoding="utf-8") as fh:
+            fh.write(it["orijinal_url"] + "\n")
 
 if __name__ == "__main__":
     main()
