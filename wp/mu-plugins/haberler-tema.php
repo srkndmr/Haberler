@@ -124,9 +124,15 @@ footer.wp-block-template-part{ display:none !important; }
   font-size:clamp(2rem,5vw,3.1rem); color:var(--hb-ink); margin:.2rem auto .8rem; text-wrap:balance; }
 .hb-hero__sub{ font-size:1.12rem; color:var(--hb-muted); max-width:52ch; margin:0 auto 1.2rem;
   text-align:center; text-wrap:balance; }
-.hb-hero__cta{ display:inline-block; background:var(--hb-accent); color:#fff!important; font-weight:600;
-  padding:10px 22px; border-radius:999px; margin-right:14px; }
-.hb-hero__cta:hover{ background:var(--hb-accent2); text-decoration:none; }
+.hb-hero__actions{ display:flex; gap:20px; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:.6rem; }
+.hb-hero__cta{ display:inline-flex; align-items:center; gap:8px; background:var(--hb-accent); color:#fff!important;
+  font-weight:600; font-size:1rem; padding:13px 28px; border-radius:10px;
+  box-shadow:0 8px 18px -10px rgba(15,76,92,.7); transition:background .15s, transform .12s, box-shadow .12s; }
+.hb-hero__cta:hover{ background:var(--hb-accent2); transform:translateY(-1px);
+  box-shadow:0 12px 22px -10px rgba(15,76,92,.6); text-decoration:none!important; }
+.hb-hero__link{ font-weight:600; color:var(--hb-accent)!important; border-bottom:1.5px solid transparent;
+  padding-bottom:1px; transition:border-color .15s; }
+.hb-hero__link:hover{ border-bottom-color:currentColor; text-decoration:none!important; }
 
 /* ---- Bölüm + Kart ızgarası ---- */
 .hb-section{ max-width:1080px; margin:2.4rem auto 0; padding-inline:1rem; }
