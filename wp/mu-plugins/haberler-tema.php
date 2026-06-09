@@ -105,7 +105,32 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 .hb-kart__baslik:hover{ color:var(--hb-accent); }
 .hb-kart__meta{ font-size:.82rem; color:var(--hb-muted); margin:6px 0 10px; }
 
-@media (max-width:640px){ body{ font-size:16px; } .entry-content,.wp-block-post-content{ padding-inline:6px; } }
+/* ---- Hero (ana sayfa) ---- */
+.hb-hero{ max-width:880px; margin:1.5rem auto 2rem; text-align:center; padding:1.5rem 1rem; }
+.hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--hb-accent); margin:0 0 .6rem; }
+.hb-hero__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.02em; line-height:1.12;
+  font-size:clamp(2rem,5vw,3.1rem); color:var(--hb-ink); margin:.2rem 0 .8rem; }
+.hb-hero__sub{ font-size:1.15rem; color:var(--hb-muted); max-width:60ch; margin:0 auto 1.1rem; }
+.hb-hero__cta{ display:inline-block; background:var(--hb-accent); color:#fff!important; font-weight:600;
+  padding:10px 22px; border-radius:999px; margin-right:14px; }
+.hb-hero__cta:hover{ background:var(--hb-accent2); text-decoration:none; }
+
+/* ---- Kart ızgarası ---- */
+.hb-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; margin:1.2rem 0; }
+.hb-kart__ozet{ color:var(--hb-text); font-size:.96rem; margin:.5rem 0 .7rem; }
+.hb-kart__chips{ margin-top:.4rem; }
+
+/* ---- Footer ---- */
+.hb-footer{ margin-top:3rem; border-top:1px solid var(--hb-line); background:var(--hb-soft); }
+.hb-footer__in{ max-width:860px; margin-inline:auto; padding:2rem 1.2rem 2.4rem; }
+.hb-footer__brand{ font-family:var(--serif); font-weight:700; font-size:1.2rem; color:var(--hb-ink); margin:0 0 .3rem; }
+.hb-footer__desc{ color:var(--hb-muted); font-size:.95rem; max-width:60ch; margin:0 0 1rem; }
+.hb-footer__nav{ display:flex; flex-wrap:wrap; gap:18px; font-weight:500; font-size:.95rem; margin-bottom:1rem; }
+.hb-footer__legal{ color:var(--hb-muted); font-size:.82rem; border-top:1px solid var(--hb-line); padding-top:1rem; margin:0; }
+
+@media (max-width:640px){ body{ font-size:16px; } .entry-content,.wp-block-post-content{ padding-inline:6px; }
+  .hb-grid{ grid-template-columns:1fr; } }
 </style>
     <?php
 }, 99);
