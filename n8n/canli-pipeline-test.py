@@ -67,7 +67,8 @@ def analyze_with_claude(item, api_key):
         "ÜRETECEĞİN ALANLAR: ozet (3-5 cümle, bağlamı kuran akıcı paragraf); genel_degerlendirme (3-5 cümle, "
         "hukuk-gazetecilik dilinde tarafsız değerlendirme: dayanak/delil durumu, olgu-yorum dengesi, eksik "
         "bağlam, masumiyet karinesi; hüküm verme); iddialar (her biri iddia_metni, siniflandirma "
-        "[dogru|kismen_dogru|yanlis|dogrulanamaz|gorus], gerekce [2-3 cümle: neden bu sınıf + doğrulanması "
+        "[dogru|kismen_dogru|yanlis|dogrulanamaz|mesnetsiz|gorus] (mesnetsiz=kaynak hiç delil/dayanak "
+        "göstermemiş; dayanak var ama teyit edilemiyorsa dogrulanamaz; tereddütte dogrulanamaz), gerekce [2-3 cümle: neden bu sınıf + doğrulanması "
         "için hangi delil gerekir], dayanak_kaynak_url); isim_verilen_suclama (evet|hayir) ve "
         "isim_verilen_suclama_gerekce. "
         "Gerekçeleri kalıp cümlelerle TEKRARLAMA; her gerekçe o iddiaya özgü olsun. Başlıktaki abartı/değer "
@@ -97,7 +98,7 @@ def safe_default(item):
             "isim_verilen_suclama_gerekce": "AI analizi yapılmadı; manuel inceleme gerekir."}
 
 def wp_create_draft(item, analiz, wp_url, user, app_pass):
-    valid = {"dogru","kismen_dogru","yanlis","dogrulanamaz","gorus"}
+    valid = {"dogru","kismen_dogru","yanlis","dogrulanamaz","mesnetsiz","gorus"}
     iddialar = [{
         "iddia_metni": str(x.get("iddia_metni",""))[:2000],
         "siniflandirma": x.get("siniflandirma") if x.get("siniflandirma") in valid else "dogrulanamaz",

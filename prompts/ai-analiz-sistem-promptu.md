@@ -35,7 +35,8 @@ SINIFLANDIRMA DEĞERLERİ (yalnızca bunlardan biri)
 - "dogru"          : İddia, güvenilir ve atıfta bulunulabilir kanıtla tam olarak doğrulanıyor.
 - "kismen_dogru"   : İddianın bir kısmı doğru, bir kısmı yanlış/eksik/bağlamdan kopuk.
 - "yanlis"         : İddia, güvenilir kanıtla açıkça çürütülüyor.
-- "dogrulanamaz"   : Eldeki bilgiyle ne doğrulanabiliyor ne çürütülebiliyor. (VARSAYILAN)
+- "dogrulanamaz"   : Bir dayanak var ama bağımsız olarak teyit edilemiyor. (VARSAYILAN — tereddütte bunu seç)
+- "mesnetsiz"      : Kaynak iddiayı HİÇBİR delil/dayanak/atıf göstermeden ileri sürmüş (doğru/yanlış ayrıca değerlendirilir).
 - "gorus"          : Olgu değil; yorum, değerlendirme, tahmin veya değer yargısı.
 
 İDDİA AYIKLAMA
@@ -67,7 +68,7 @@ isim_verilen_suclama ALANI (hukuk kapısı)
   "iddialar": [
     {
       "iddia_metni": "string",
-      "siniflandirma": "dogru | kismen_dogru | yanlis | dogrulanamaz | gorus",
+      "siniflandirma": "dogru | kismen_dogru | yanlis | dogrulanamaz | mesnetsiz | gorus",
       "gerekce": "string",
       "dayanak_kaynak_url": "string (yoksa \"\")"
     }

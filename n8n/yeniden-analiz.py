@@ -28,14 +28,17 @@ SISTEM = (
 "açısından dikkat edilmesi gerekenler. Hüküm verme; 'şu doğrulanabilir, şu şu delili gerektirir' "
 "biçiminde yaz.\n"
 "- iddialar: her somut iddia için iddia_metni; siniflandirma (dogru|kismen_dogru|yanlis|"
-"dogrulanamaz|gorus); gerekce (2-3 cümle: neden bu sınıfa konduğu VE doğrulanması için hangi "
+"dogrulanamaz|mesnetsiz|gorus); gerekce (2-3 cümle: neden bu sınıfa konduğu VE doğrulanması için hangi "
 "delilin gerekeceği); dayanak_kaynak_url (varsa, yoksa boş).\n"
 "- isim_verilen_suclama (evet|hayir) ve isim_verilen_suclama_gerekce.\n\n"
 "DİL KURALLARI: Gerekçeleri kalıp cümlelerle TEKRARLAMA; her iddianın gerekçesi o iddiaya özgü ve "
 "özgün olsun (aynı 'mahkeme kararları, tanık ifadeleri gereklidir' kalıbını her maddede tekrarlama). "
 "Başlık veya metindeki abartı/değer yargısı ifadelerini ('planı patladı' gibi) tırnak içinde ve "
 "kaynağa atfederek aktar; kendi sesinle benimseme. 'Doğrulanamadı' bir suçlama değil, kanıt eksikliği "
-"tespitidir; bunu ima eden ölçülü bir dil kullan.\n\n"
+"tespitidir; bunu ima eden ölçülü bir dil kullan.\n"
+"SINIFLANDIRMA AYRIMI: 'mesnetsiz' = kaynak, iddiayı HİÇBİR delil/dayanak/atıf göstermeden ileri "
+"sürmüşse (kaynağın eksikliğine dair tespit; doğru/yanlış olduğu ayrıca değerlendirilir). Bir dayanak "
+"var ama bağımsız teyit edemiyorsan 'dogrulanamaz'. Tereddütte 'dogrulanamaz' (daha az iddialı olan).\n\n"
 "ÇIKTI: yalnızca geçerli JSON döndür; markdown, kod bloğu veya önsöz YOK."
 )
 
@@ -73,7 +76,7 @@ def main():
     ids = sys.argv[1:]
     if not ids:
         print("ID verin: python3 yeniden-analiz.py 38 40 ..."); sys.exit(1)
-    valid = {"dogru","kismen_dogru","yanlis","dogrulanamaz","gorus"}
+    valid = {"dogru","kismen_dogru","yanlis","dogrulanamaz","mesnetsiz","gorus"}
     for pid in ids:
         try:
             p = wp_get(pid)

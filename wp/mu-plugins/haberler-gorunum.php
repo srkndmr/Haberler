@@ -10,6 +10,7 @@ const HABERLER_SINIF_RENK = [
     'kismen_dogru' => ['Kısmen Doğru', '#9a6700'],
     'yanlis'       => ['Yanlış', '#cf222e'],
     'dogrulanamaz' => ['Doğrulanamadı', '#57606a'],
+    'mesnetsiz'    => ['Mesnetsiz', '#c2410c'],
     'gorus'        => ['Görüş', '#7c3aed'],
 ];
 const HABERLER_SINIF_ACIKLAMA = [
@@ -17,6 +18,7 @@ const HABERLER_SINIF_ACIKLAMA = [
     'kismen_dogru' => 'Bir kısmı doğru; bir kısmı eksik, yanlış veya bağlamından kopuk.',
     'yanlis'       => 'Güvenilir kanıtla çürütüldü.',
     'dogrulanamaz' => 'İddia ne doğrulanabildi ne çürütüldü — bağımsız kanıt sunulmadığı için açık bırakıldı (suçlama anlamına gelmez).',
+    'mesnetsiz'    => 'Kaynak, iddiayı somut bir delil/dayanak göstermeden ileri sürmüş — doğru ya da yanlış olduğu ayrıca değerlendirilir.',
     'gorus'        => 'Olgu değil; yorum, değerlendirme veya değer yargısı.',
 ];
 

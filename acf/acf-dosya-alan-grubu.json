@@ -119,7 +119,8 @@
               "dogru": "Doğru",
               "kismen_dogru": "Kısmen doğru",
               "yanlis": "Yanlış",
-              "dogrulanamaz": "Doğrulanamaz",
+              "dogrulanamaz": "Doğrulanamadı",
+              "mesnetsiz": "Mesnetsiz",
               "gorus": "Görüş"
             },
             "default_value": "dogrulanamaz",

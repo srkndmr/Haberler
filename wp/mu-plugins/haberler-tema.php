@@ -12,7 +12,7 @@ add_action('wp_head', function () {
 :root{
   --hb-ink:#15202b; --hb-text:#2b2f36; --hb-muted:#5b6570; --hb-line:#e6e8eb;
   --hb-bg:#ffffff; --hb-soft:#f7f8fa; --hb-accent:#15457a;
-  --c-dogru:#1a7f37; --c-kismen:#9a6700; --c-yanlis:#cf222e; --c-dogrulanamaz:#57606a; --c-gorus:#7c3aed;
+  --c-dogru:#1a7f37; --c-kismen:#9a6700; --c-yanlis:#cf222e; --c-dogrulanamaz:#57606a; --c-mesnetsiz:#c2410c; --c-gorus:#7c3aed;
 }
 body{ color:var(--hb-text); background:var(--hb-bg);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
@@ -52,13 +52,14 @@ h2{ color:var(--hb-ink); font-weight:750; letter-spacing:-.01em; margin-top:1.8r
 .hb-iddia--kismen_dogru{ border-left-color:var(--c-kismen); }
 .hb-iddia--yanlis{ border-left-color:var(--c-yanlis); }
 .hb-iddia--dogrulanamaz{ border-left-color:var(--c-dogrulanamaz); }
+.hb-iddia--mesnetsiz{ border-left-color:var(--c-mesnetsiz); }
 .hb-iddia--gorus{ border-left-color:var(--c-gorus); }
 
 .hb-chip{ display:inline-block; color:#fff; font-size:.72rem; font-weight:700;
   text-transform:uppercase; letter-spacing:.02em; padding:3px 9px; border-radius:999px; margin:0 4px 2px 0; }
 .hb-chip--dogru{ background:var(--c-dogru); } .hb-chip--kismen_dogru{ background:var(--c-kismen); }
 .hb-chip--yanlis{ background:var(--c-yanlis); } .hb-chip--dogrulanamaz{ background:var(--c-dogrulanamaz); }
-.hb-chip--gorus{ background:var(--c-gorus); }
+.hb-chip--mesnetsiz{ background:var(--c-mesnetsiz); } .hb-chip--gorus{ background:var(--c-gorus); }
 
 /* Kaynaklar */
 .hb-kaynaklar{ list-style:none; padding:0; margin:.5rem 0; }
