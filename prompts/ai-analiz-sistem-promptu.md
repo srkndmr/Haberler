@@ -62,7 +62,8 @@ isim_verilen_suclama ALANI (hukuk kapısı)
 
 ŞEMA
 {
-  "ozet": "string — dosyanın 2-4 cümlelik nötr özeti",
+  "ozet": "string — 3-5 cümlelik, bağlamı kuran akıcı nötr özet",
+  "genel_degerlendirme": "string — 3-5 cümlelik, hukuki-gazetecilik dilinde tarafsız genel değerlendirme (dayanak/delil durumu, olgu-yorum dengesi, eksik bağlam; hüküm vermez)",
   "iddialar": [
     {
       "iddia_metni": "string",

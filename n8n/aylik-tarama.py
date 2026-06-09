@@ -35,14 +35,18 @@ def google_news_search(query, gun="45d"):
     return items
 
 def analyze_with_claude(item, api_key, model):
-    sysp = ("Sen bir doğruluk denetimi analiz asistanısın. Hâkim değilsin. Türkçe haber metnindeki "
-            "somut iddiaları ayıkla ve her birini şu değerlerden biriyle sınıflandır: dogru, kismen_dogru, "
-            "yanlis, dogrulanamaz, gorus. Emin değilsen dogrulanamaz. Olgu ile yorumu ayır; yorum ise gorus. "
-            "Masumiyet karinesi: suç veya örgüt üyeliği isnatları kaynağa atfedilen iddialardır, olgu gibi "
-            "ileri sürme. SADECE geçerli JSON döndür, markdown YOK. Alanlar: ozet, iddialar "
-            "(liste; iddia_metni, siniflandirma, gerekce, dayanak_kaynak_url), isim_verilen_suclama "
-            "(evet/hayir), isim_verilen_suclama_gerekce. Belirli kişi/kurum adı + ağır suçlama varsa evet; kararsızsan evet.")
-    body = json.dumps({"model": model, "max_tokens": 1500, "temperature": 0, "system": sysp,
+    sysp = ("Sen kıdemli bir doğruluk denetimi analistisin; medya hukuku editörü gibi düşünürsün ama "
+            "hâkim değilsin. Türkçe haber metnini inceleyip insan editör/hukuk danışmanının önüne gelecek "
+            "AKICI, OKUNABİLİR bir taslak hazırlarsın. Mekanik tek cümlelik ifadelerden kaçın; gerekçeli, "
+            "bağlamı açıklayan, ölçülü bir hukuk-gazetecilik dili kullan. İlkeler: kanıt yoksa dogrulanamaz; "
+            "olgu/yorum ayrımı (yorum -> gorus); masumiyet karinesi (suç/üyelik isnatları kaynağa atfedilir, "
+            "olgu gibi ileri sürülmez); nötr dil, uydurma yok. Alanlar: ozet (3-5 cümle bağlamlı paragraf); "
+            "genel_degerlendirme (3-5 cümle tarafsız hukuki-gazetecilik değerlendirmesi: dayanak/delil durumu, "
+            "olgu-yorum dengesi, eksik bağlam; hüküm verme); iddialar (iddia_metni, siniflandirma "
+            "[dogru|kismen_dogru|yanlis|dogrulanamaz|gorus], gerekce [2-3 cümle: neden bu sınıf + hangi delil "
+            "gerekir], dayanak_kaynak_url); isim_verilen_suclama (evet/hayir), isim_verilen_suclama_gerekce. "
+            "Belirli kişi/kurum adı + ağır suçlama varsa evet; kararsızsan evet. SADECE geçerli JSON, markdown YOK.")
+    body = json.dumps({"model": model, "max_tokens": 2500, "temperature": 0.2, "system": sysp,
         "messages": [{"role": "user", "content": f"BAŞLIK: {item['baslik']}\n\nÖZET: {item['ozet']}"}]}).encode()
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body, headers={
         "x-api-key": api_key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
@@ -60,7 +64,7 @@ def wp_create_draft(item, a, wp_url, user, app):
     isim = "hayir" if a.get("isim_verilen_suclama") == "hayir" else "evet"
     payload = {"title": item["baslik"][:120] or "Başlıksız", "status": "draft",
         "content": "Otomatik üretilmiş TASLAK (aylık backfill) — editör/hukuk incelemesi bekliyor.",
-        "meta": {"haberler_ozet": a.get("ozet",""), "haberler_isim_verilen_suclama": isim,
+        "meta": {"haberler_ozet": a.get("ozet",""), "haberler_genel_degerlendirme": a.get("genel_degerlendirme",""), "haberler_isim_verilen_suclama": isim,
             "haberler_isim_suclama_gerekce": a.get("isim_verilen_suclama_gerekce",""),
             "haberler_kaynaklar": json.dumps([{"kaynak_adi": item["kaynak_adi"],
                 "orijinal_url": item["orijinal_url"], "yayin_tarihi": item["yayin_tarihi"]}], ensure_ascii=False),

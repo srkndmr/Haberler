@@ -23,6 +23,7 @@ function haberler_dosya_render($content) {
     $kay   = json_decode((string) get_post_meta($id, 'haberler_kaynaklar', true), true);
     $idd   = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
     $isim  = get_post_meta($id, 'haberler_isim_verilen_suclama', true);
+    $gd    = get_post_meta($id, 'haberler_genel_degerlendirme', true);
     if (!$ozet && !$kay && !$idd) return $content; // dosya değil → dokunma
 
     // LİSTELEME (anasayfa/arşiv): kompakt özet + sınıflandırma rozetleri
@@ -55,7 +56,13 @@ function haberler_dosya_render($content) {
         . 'Hukuki/cezai nitelemeler mahkemelerin işidir, kesin hüküm değildir.</p>';
 
     if ($ozet) {
-        $h .= '<h2>Özet</h2><p>' . esc_html($ozet) . '</p>';
+        $h .= '<h2>Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
+    }
+
+    if ($gd) {
+        $h .= '<h2>Genel Değerlendirme</h2>';
+        $h .= '<div style="background:#f0f4f8;border-left:4px solid #1f2937;padding:12px 16px;border-radius:6px;line-height:1.6">'
+            . nl2br(esc_html($gd)) . '</div>';
     }
 
     if (is_array($idd) && $idd) {

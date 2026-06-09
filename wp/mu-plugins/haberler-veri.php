@@ -8,6 +8,7 @@ if (!defined('ABSPATH')) exit;
 
 const HABERLER_META = [
     'haberler_ozet',
+    'haberler_genel_degerlendirme',    // hukuki-gazetecilik dilinde genel değerlendirme
     'haberler_isim_verilen_suclama',   // 'evet' | 'hayir'
     'haberler_isim_suclama_gerekce',
     'haberler_kaynaklar',              // JSON: [{kaynak_adi,orijinal_url,yayin_tarihi,arsiv_url,ekran_goruntusu}]
@@ -46,9 +47,13 @@ function haberler_dosya_box($post) {
     $ger  = get_post_meta($post->ID, 'haberler_isim_suclama_gerekce', true);
     $kay  = get_post_meta($post->ID, 'haberler_kaynaklar', true);
     $idd  = get_post_meta($post->ID, 'haberler_iddialar', true);
+    $gd = get_post_meta($post->ID, 'haberler_genel_degerlendirme', true);
     ?>
     <p><strong>Özet</strong></p>
-    <textarea name="haberler_ozet" rows="3" style="width:100%"><?php echo esc_textarea($ozet); ?></textarea>
+    <textarea name="haberler_ozet" rows="4" style="width:100%"><?php echo esc_textarea($ozet); ?></textarea>
+
+    <p style="margin-top:14px"><strong>Genel Değerlendirme</strong> (hukuki-gazetecilik dili)</p>
+    <textarea name="haberler_genel_degerlendirme" rows="5" style="width:100%"><?php echo esc_textarea($gd); ?></textarea>
 
     <p style="margin-top:14px"><strong>İsim verilen suçlama var mı?</strong>
        <span style="color:#a00">(evet ise hukuk kapısı tetiklenir)</span></p>
@@ -121,6 +126,8 @@ add_action('save_post_post', function ($post_id) {
         // JSON alanlarını ham bırak (sadece slash temizle); diğerlerini metin temizle
         if (in_array($key, ['haberler_kaynaklar', 'haberler_iddialar'], true)) {
             update_post_meta($post_id, $key, wp_unslash($_POST[$key]));
+        } elseif (in_array($key, ['haberler_ozet', 'haberler_genel_degerlendirme'], true)) {
+            update_post_meta($post_id, $key, sanitize_textarea_field(wp_unslash($_POST[$key])));
         } else {
             update_post_meta($post_id, $key, sanitize_text_field(wp_unslash($_POST[$key])));
         }

@@ -57,16 +57,23 @@ def keyword_filter(items):
 
 def analyze_with_claude(item, api_key):
     sys_prompt = (
-        "Sen bir doğruluk denetimi analiz asistanısın. Hâkim değilsin. Metindeki somut "
-        "iddiaları ayıkla ve her birini dogru/kismen_dogru/yanlis/dogrulanamaz/gorus olarak "
-        "sınıflandır; emin değilsen dogrulanamaz. Masumiyet karinesi: suç/üyelik isnatları "
-        "kaynağa atfedilen iddialardır. SADECE şu şemada geçerli JSON döndür (markdown yok): "
-        '{"ozet":"","iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"","dayanak_kaynak_url":""}],'
-        '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}'
+        "Sen kıdemli bir doğruluk denetimi (fact-checking) analistisin; medya hukuku editörü gibi "
+        "düşünürsün ama hâkim değilsin. Türkçe haber metnini inceleyip insan editör ve hukuk "
+        "danışmanının önüne gelecek AKICI ve OKUNABİLİR bir taslak hazırlarsın. Mekanik, tek cümlelik, "
+        "robotik ifadelerden kaçın; gerekçeli, bağlamı açıklayan, ölçülü bir hukuk-gazetecilik dili kullan. "
+        "İlkeler: sonuç önceden belli değildir, atıfta bulunulabilir kanıt yoksa dogrulanamaz de; olgu ile "
+        "yorumu ayır (yorum -> gorus); masumiyet karinesi: suç/örgüt üyeliği isnatları kaynağa atfedilen "
+        "iddialardır, olgu gibi ileri sürme; nötr dil, uydurma kaynak yok. "
+        "ÜRETECEĞİN ALANLAR: ozet (3-5 cümle, bağlamı kuran akıcı paragraf); genel_degerlendirme (3-5 cümle, "
+        "hukuk-gazetecilik dilinde tarafsız değerlendirme: dayanak/delil durumu, olgu-yorum dengesi, eksik "
+        "bağlam, masumiyet karinesi; hüküm verme); iddialar (her biri iddia_metni, siniflandirma "
+        "[dogru|kismen_dogru|yanlis|dogrulanamaz|gorus], gerekce [2-3 cümle: neden bu sınıf + doğrulanması "
+        "için hangi delil gerekir], dayanak_kaynak_url); isim_verilen_suclama (evet|hayir) ve "
+        "isim_verilen_suclama_gerekce. SADECE geçerli JSON döndür; markdown/kod bloğu/önsöz YOK."
     )
     body = json.dumps({
         "model": os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
-        "max_tokens": 1500, "temperature": 0,
+        "max_tokens": 2500, "temperature": 0.2,
         "system": sys_prompt,
         "messages": [{"role": "user", "content": f"BAŞLIK: {item['baslik']}\n\nÖZET: {item['ozet']}"}],
     }).encode()
@@ -82,7 +89,7 @@ def analyze_with_claude(item, api_key):
     return json.loads(m.group(0))
 
 def safe_default(item):
-    return {"ozet": item["ozet"][:400], "iddialar": [],
+    return {"ozet": item["ozet"][:400], "genel_degerlendirme": "", "iddialar": [],
             "isim_verilen_suclama": "evet",  # AI yoksa güvenli taraf: hukuk kapısı açık
             "isim_verilen_suclama_gerekce": "AI analizi yapılmadı; manuel inceleme gerekir."}
 
@@ -101,6 +108,7 @@ def wp_create_draft(item, analiz, wp_url, user, app_pass):
         "content": "Otomatik üretilmiş TASLAK — editör/hukuk incelemesi bekliyor.",
         "meta": {
             "haberler_ozet": analiz.get("ozet",""),
+            "haberler_genel_degerlendirme": analiz.get("genel_degerlendirme",""),
             "haberler_isim_verilen_suclama": isim,
             "haberler_isim_suclama_gerekce": analiz.get("isim_verilen_suclama_gerekce",""),
             "haberler_kaynaklar": json.dumps([{
