@@ -45,7 +45,10 @@ def analyze_with_claude(item, api_key, model):
             "olgu-yorum dengesi, eksik bağlam; hüküm verme); iddialar (iddia_metni, siniflandirma "
             "[dogru|kismen_dogru|yanlis|dogrulanamaz|gorus], gerekce [2-3 cümle: neden bu sınıf + hangi delil "
             "gerekir], dayanak_kaynak_url); isim_verilen_suclama (evet/hayir), isim_verilen_suclama_gerekce. "
-            "Belirli kişi/kurum adı + ağır suçlama varsa evet; kararsızsan evet. SADECE geçerli JSON, markdown YOK.")
+            "Belirli kişi/kurum adı + ağır suçlama varsa evet; kararsızsan evet. "
+            "Gerekçeleri kalıp cümlelerle TEKRARLAMA; her biri o iddiaya özgü olsun. Başlıktaki abartı/değer "
+            "yargısı ifadelerini tırnak içinde kaynağa atfet. 'Doğrulanamadı' suçlama değil kanıt eksikliği "
+            "tespitidir. SADECE geçerli JSON, markdown YOK.")
     body = json.dumps({"model": model, "max_tokens": 2500, "temperature": 0.2, "system": sysp,
         "messages": [{"role": "user", "content": f"BAŞLIK: {item['baslik']}\n\nÖZET: {item['ozet']}"}]}).encode()
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body, headers={

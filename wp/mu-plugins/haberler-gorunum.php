@@ -8,10 +8,18 @@ if (!defined('ABSPATH')) exit;
 
 const HABERLER_SINIF_RENK = [
     'dogru'        => ['Doğru', '#1a7f37'],
-    'kismen_dogru' => ['Kısmen doğru', '#9a6700'],
+    'kismen_dogru' => ['Kısmen Doğru', '#9a6700'],
     'yanlis'       => ['Yanlış', '#cf222e'],
-    'dogrulanamaz' => ['Doğrulanamaz', '#57606a'],
+    'dogrulanamaz' => ['Doğrulanamadı', '#57606a'],
     'gorus'        => ['Görüş', '#8250df'],
+];
+
+const HABERLER_SINIF_ACIKLAMA = [
+    'dogru'        => 'Güvenilir kanıtla doğrulandı.',
+    'kismen_dogru' => 'Bir kısmı doğru; bir kısmı eksik, yanlış veya bağlamından kopuk.',
+    'yanlis'       => 'Güvenilir kanıtla çürütüldü.',
+    'dogrulanamaz' => 'İddia ne doğrulanabildi ne çürütüldü — bağımsız kanıt sunulmadığı için açık bırakıldı (suçlama anlamına gelmez).',
+    'gorus'        => 'Olgu değil; yorum, değerlendirme veya değer yargısı.',
 ];
 
 function haberler_dosya_render($content) {
@@ -67,6 +75,19 @@ function haberler_dosya_render($content) {
 
     if (is_array($idd) && $idd) {
         $h .= '<h2>İddialar ve Değerlendirme</h2>';
+
+        // Bu dosyada kullanılan sınıflandırmaların açıklama lejantı
+        $kullanilan = array_unique(array_map(function ($x) { return $x['siniflandirma'] ?? 'dogrulanamaz'; }, $idd));
+        $h .= '<div style="font-size:.82rem;background:#fafafa;border:1px solid #eee;border-radius:6px;padding:8px 12px;margin:8px 0">';
+        foreach ($kullanilan as $s) {
+            [$et, $rk] = HABERLER_SINIF_RENK[$s] ?? ['Doğrulanamadı', '#57606a'];
+            $ac = HABERLER_SINIF_ACIKLAMA[$s] ?? '';
+            $h .= '<div style="margin:3px 0"><span style="display:inline-block;background:' . esc_attr($rk)
+                . ';color:#fff;font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:4px">' . esc_html($et)
+                . '</span> <span style="color:#555">' . esc_html($ac) . '</span></div>';
+        }
+        $h .= '</div>';
+
         foreach ($idd as $x) {
             $s = $x['siniflandirma'] ?? 'dogrulanamaz';
             [$etiket, $renk] = HABERLER_SINIF_RENK[$s] ?? ['Doğrulanamaz', '#57606a'];

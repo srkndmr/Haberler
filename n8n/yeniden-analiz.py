@@ -31,6 +31,11 @@ SISTEM = (
 "dogrulanamaz|gorus); gerekce (2-3 cümle: neden bu sınıfa konduğu VE doğrulanması için hangi "
 "delilin gerekeceği); dayanak_kaynak_url (varsa, yoksa boş).\n"
 "- isim_verilen_suclama (evet|hayir) ve isim_verilen_suclama_gerekce.\n\n"
+"DİL KURALLARI: Gerekçeleri kalıp cümlelerle TEKRARLAMA; her iddianın gerekçesi o iddiaya özgü ve "
+"özgün olsun (aynı 'mahkeme kararları, tanık ifadeleri gereklidir' kalıbını her maddede tekrarlama). "
+"Başlık veya metindeki abartı/değer yargısı ifadelerini ('planı patladı' gibi) tırnak içinde ve "
+"kaynağa atfederek aktar; kendi sesinle benimseme. 'Doğrulanamadı' bir suçlama değil, kanıt eksikliği "
+"tespitidir; bunu ima eden ölçülü bir dil kullan.\n\n"
 "ÇIKTI: yalnızca geçerli JSON döndür; markdown, kod bloğu veya önsöz YOK."
 )
 

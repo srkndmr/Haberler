@@ -7,8 +7,8 @@ if (!defined('ABSPATH')) exit;
 
 function haberler_arsiv_renk() {
     return [
-        'dogru'=>['Doğru','#1a7f37'],'kismen_dogru'=>['Kısmen doğru','#9a6700'],
-        'yanlis'=>['Yanlış','#cf222e'],'dogrulanamaz'=>['Doğrulanamaz','#57606a'],
+        'dogru'=>['Doğru','#1a7f37'],'kismen_dogru'=>['Kısmen Doğru','#9a6700'],
+        'yanlis'=>['Yanlış','#cf222e'],'dogrulanamaz'=>['Doğrulanamadı','#57606a'],
         'gorus'=>['Görüş','#8250df'],
     ];
 }

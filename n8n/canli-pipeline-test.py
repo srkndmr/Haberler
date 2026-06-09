@@ -69,7 +69,10 @@ def analyze_with_claude(item, api_key):
         "bağlam, masumiyet karinesi; hüküm verme); iddialar (her biri iddia_metni, siniflandirma "
         "[dogru|kismen_dogru|yanlis|dogrulanamaz|gorus], gerekce [2-3 cümle: neden bu sınıf + doğrulanması "
         "için hangi delil gerekir], dayanak_kaynak_url); isim_verilen_suclama (evet|hayir) ve "
-        "isim_verilen_suclama_gerekce. SADECE geçerli JSON döndür; markdown/kod bloğu/önsöz YOK."
+        "isim_verilen_suclama_gerekce. "
+        "Gerekçeleri kalıp cümlelerle TEKRARLAMA; her gerekçe o iddiaya özgü olsun. Başlıktaki abartı/değer "
+        "yargısı ifadelerini ('planı patladı' gibi) tırnak içinde kaynağa atfederek ver. 'Doğrulanamadı' "
+        "bir suçlama değil kanıt eksikliği tespitidir. SADECE geçerli JSON döndür; markdown/kod bloğu/önsöz YOK."
     )
     body = json.dumps({
         "model": os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001"),
