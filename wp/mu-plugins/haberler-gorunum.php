@@ -71,7 +71,7 @@ function haberler_dosya_render($content) {
             $vchips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . haberler_etiket($s)) . '</span>';
         }
         $ks = is_array($kay) ? count($kay) : 0;
-        $h .= '<div class="hb-verdict"><div class="hb-verdict__kicker">Dosya Değerlendirmesi</div>'
+        $h .= '<div class="hb-verdict"><div class="hb-verdict__kicker">DOSYA DEĞERLENDİRMESİ</div>'
             . '<div class="hb-verdict__chips">' . $vchips . '</div>'
             . '<div class="hb-verdict__note">' . esc_html(count($idd)) . ' iddia incelendi'
             . ($ks ? ' · ' . esc_html($ks) . ' kaynak' : '') . '</div></div>';

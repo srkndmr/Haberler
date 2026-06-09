@@ -55,7 +55,7 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 /* Değerlendirme kutusu (verdict) */
 .hb-verdict{ background:linear-gradient(180deg,#fbfdfd, #f2f7f7); border:1px solid #d8e6e6;
   border-radius:16px; padding:18px 20px; margin:18px 0 24px; box-shadow:var(--shadow); }
-.hb-verdict__kicker{ font-size:.72rem; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--hb-accent); }
+.hb-verdict__kicker{ font-size:.74rem; font-weight:700; letter-spacing:.1em; color:var(--hb-accent); }
 .hb-verdict__chips{ margin:10px 0 6px; display:flex; flex-wrap:wrap; gap:6px; }
 .hb-verdict__note{ font-size:.86rem; color:var(--hb-muted); }
 
@@ -80,8 +80,8 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 .hb-iddia--mesnetsiz{ border-left-color:var(--c-mesnetsiz); } .hb-iddia--gorus{ border-left-color:var(--c-gorus); }
 
 /* Rozet (pill) */
-.hb-chip{ display:inline-block; color:#fff; font-size:.7rem; font-weight:700; font-family:var(--sans);
-  text-transform:uppercase; letter-spacing:.04em; padding:4px 11px; border-radius:999px; margin:0 4px 2px 0; }
+.hb-chip{ display:inline-block; color:#fff; font-size:.74rem; font-weight:600; font-family:var(--sans);
+  letter-spacing:.01em; padding:4px 11px; border-radius:999px; margin:0 4px 2px 0; }
 .hb-chip--dogru{ background:var(--c-dogru); } .hb-chip--kismen_dogru{ background:var(--c-kismen); }
 .hb-chip--yanlis{ background:var(--c-yanlis); } .hb-chip--dogrulanamaz{ background:var(--c-dogrulanamaz); }
 .hb-chip--mesnetsiz{ background:var(--c-mesnetsiz); } .hb-chip--gorus{ background:var(--c-gorus); }
@@ -108,8 +108,9 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 .hb-kart__meta{ font-size:.82rem; color:var(--hb-muted); margin:6px 0 10px; }
 
 /* ---- Hero (ana sayfa) ---- */
-.hb-hero{ max-width:880px; margin:1.5rem auto 2rem; text-align:center; padding:1.5rem 1rem; }
-.hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+.home .wp-block-post-content{ padding-top:.5rem; }
+.hb-hero{ max-width:880px; margin:.5rem auto 1.5rem; text-align:center; padding:.5rem 1rem 0; }
+.hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em;
   color:var(--hb-accent); margin:0 0 .6rem; }
 .hb-hero__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.02em; line-height:1.12;
   font-size:clamp(2rem,5vw,3.1rem); color:var(--hb-ink); margin:.2rem 0 .8rem; }
