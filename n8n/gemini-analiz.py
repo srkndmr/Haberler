@@ -1,0 +1,72 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Gemini (Google Search grounding) ile kanıt-temelli haber analizi.
+Claude'dan farkı: canlı web araması yapıp iddiaları gerçek kaynaklarla test eder.
+
+Kullanım:
+  cd n8n && . ./scheduler/.env && python3 gemini-analiz.py "BAŞLIK" "isteğe bağlı bağlam"
+Argüman verilmezse örnek bir başlıkla çalışır.
+"""
+import os, re, sys, json, urllib.request
+
+SISTEM = (
+"Sen kıdemli bir doğruluk denetimi (fact-checking) analistisin; medya hukuku editörü gibi düşünürsün "
+"ama hâkim değilsin. GOOGLE ARAMA aracın var: iddiaları doğrulamak için web'de araştır, güvenilir "
+"kaynaklara (resmi kurum, mahkeme/savcılık, saygın haber) dayan. Türkçe, akıcı, ölçülü bir hukuk-"
+"gazetecilik dili kullan; mekanik olma. İlkeler: olgu/yorum ayır (yorum -> gorus); masumiyet karinesi "
+"(suç/örgüt üyeliği isnatları kaynağa atfedilen iddialardır, olgu gibi ileri sürme); nötr dil; uydurma yok.\n"
+"SINIFLANDIRMA: dogru | kismen_dogru | yanlis | dogrulanamaz | mesnetsiz | gorus. "
+"mesnetsiz=kaynak hiç delil göstermemiş; dayanak var ama teyit edemiyorsan dogrulanamaz; tereddütte dogrulanamaz. "
+"Aramayla net kanıt bulursan dogru/yanlis kullan ve dayanak_kaynak_url ver.\n"
+"SADECE şu şemada geçerli JSON döndür (markdown/kod bloğu YOK): "
+'{"ozet":"3-5 cümle bağlamlı özet","genel_degerlendirme":"3-5 cümle tarafsız değerlendirme",'
+'"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle, arama bulgusuna dayalı","dayanak_kaynak_url":""}],'
+'"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}'
+)
+
+def gemini_grounded(baslik, metin, key, model):
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
+    body = json.dumps({
+        "system_instruction": {"parts": [{"text": SISTEM}]},
+        "contents": [{"role": "user", "parts": [{"text": f"BAŞLIK: {baslik}\n\nBAĞLAM: {metin}\n\nİddiaları web'de araştırıp şemaya göre değerlendir."}]}],
+        "tools": [{"google_search": {}}],
+        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2500},
+    }).encode()
+    req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
+    data = json.loads(urllib.request.urlopen(req, timeout=120).read())
+    cand = (data.get("candidates") or [{}])[0]
+    parts = cand.get("content", {}).get("parts", [])
+    text = "".join(p.get("text", "") for p in parts)
+    # grounding kaynakları
+    gm = cand.get("groundingMetadata", {})
+    sources = []
+    for ch in gm.get("groundingChunks", []):
+        w = ch.get("web", {})
+        if w.get("uri"): sources.append((w.get("title", ""), w["uri"]))
+    queries = gm.get("webSearchQueries", [])
+    m = re.search(r"\{.*\}", text, re.DOTALL)
+    analiz = json.loads(m.group(0)) if m else {"_ham": text}
+    return analiz, sources, queries
+
+def main():
+    key = os.environ.get("GEMINI_API_KEY"); model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+    if not key: print("HATA: GEMINI_API_KEY gerekli."); sys.exit(1)
+    baslik = sys.argv[1] if len(sys.argv) > 1 else "İzmir'de FETÖ soruşturması: 78 gözaltı kararı"
+    metin  = sys.argv[2] if len(sys.argv) > 2 else ""
+    print(f"BAŞLIK: {baslik}\nModel: {model} (Google Search grounding)\n" + "="*60)
+    a, sources, queries = gemini_grounded(baslik, metin, key, model)
+    print("\n— ARAMA SORGULARI —"); print("  " + " | ".join(queries) if queries else "  (yok)")
+    print("\n— ÖZET —\n" + (a.get("ozet","") or a.get("_ham","")[:500]))
+    print("\n— GENEL DEĞERLENDİRME —\n" + a.get("genel_degerlendirme",""))
+    print("\n— İDDİALAR —")
+    for i, x in enumerate(a.get("iddialar", []), 1):
+        print(f"  [{i}] {x.get('siniflandirma','?').upper()}: {x.get('iddia_metni','')}")
+        print(f"      gerekçe: {x.get('gerekce','')}")
+        if x.get("dayanak_kaynak_url"): print(f"      dayanak: {x['dayanak_kaynak_url']}")
+    print(f"\nisim_verilen_suclama: {a.get('isim_verilen_suclama','?')} — {a.get('isim_verilen_suclama_gerekce','')}")
+    print("\n— GROUNDING KAYNAKLARI —")
+    for t, u in sources[:8]: print(f"  • {t[:50]} {u}")
+
+if __name__ == "__main__":
+    main()
