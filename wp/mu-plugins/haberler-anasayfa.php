@@ -24,7 +24,9 @@ add_shortcode('haberler_son_dosyalar', function ($atts) {
         foreach ($idd as $x) { $s = $x['siniflandirma'] ?? 'dogrulanamaz'; $say[$s] = ($say[$s] ?? 0) + 1; }
         $chips = '';
         foreach ($say as $s => $n) {
-            $chips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . $etk($s)) . '</span>';
+            $chips .= function_exists('haberler_chip')
+                ? haberler_chip($s, $n . ' ' . $etk($s))
+                : '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . $etk($s)) . '</span>';
         }
         $kn = array_values(array_unique(array_filter(array_column($kay, 'kaynak_adi'))));
         $out .= '<article class="hb-kart">';
@@ -45,11 +47,12 @@ add_action('wp_footer', function () {
     echo '<p class="hb-footer__brand">Bağımsız Medya İzleme</p>';
     echo '<p class="hb-footer__desc">Bağımsız doğruluk denetimi ve medya izleme girişimi. Her dosya insan '
        . 'editör onayından geçer; iddialar kaynağına atfedilir ve kesin hüküm değildir.</p>';
+    $ic = function ($n) { return function_exists('haberler_ic') ? haberler_ic($n) : ''; };
     echo '<nav class="hb-footer__nav">'
-       . '<a href="' . esc_url(home_url('/metodoloji/')) . '">Metodoloji</a>'
-       . '<a href="' . esc_url(home_url('/kunye/')) . '">Künye</a>'
-       . '<a href="' . esc_url(home_url('/arsiv/')) . '">Arşiv</a>'
-       . '<a href="' . esc_url(home_url('/iletisim-duzeltme-talebi/')) . '">İletişim / Düzeltme Talebi</a>'
+       . '<a href="' . esc_url(home_url('/metodoloji/')) . '">' . $ic('scale') . 'Metodoloji</a>'
+       . '<a href="' . esc_url(home_url('/kunye/')) . '">' . $ic('doc') . 'Künye</a>'
+       . '<a href="' . esc_url(home_url('/arsiv/')) . '">' . $ic('check') . 'Arşiv</a>'
+       . '<a href="' . esc_url(home_url('/iletisim-duzeltme-talebi/')) . '">' . $ic('link') . 'İletişim / Düzeltme Talebi</a>'
        . '</nav>';
     echo '<p class="hb-footer__legal">© ' . esc_html(date('Y')) . ' · Bu bir haber kaynağı veya hukuki danışmanlık hizmeti değildir.</p>';
     echo '</div></footer>';

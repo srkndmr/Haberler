@@ -91,8 +91,9 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-iddia--mesnetsiz{ border-left-color:var(--c-mesnetsiz); } .hb-iddia--gorus{ border-left-color:var(--c-gorus); }
 
 /* Rozet (pill) */
-.hb-chip{ display:inline-block; color:#fff; font-size:.74rem; font-weight:600; font-family:var(--sans);
-  letter-spacing:.01em; padding:4px 11px; border-radius:999px; margin:0 4px 2px 0; }
+.hb-chip{ display:inline-flex; align-items:center; gap:5px; color:#fff; font-size:.74rem; font-weight:600;
+  font-family:var(--sans); letter-spacing:.01em; padding:4px 11px; border-radius:999px; margin:0 4px 2px 0; vertical-align:middle; }
+.hb-chip-ic{ width:.95em; height:.95em; flex:none; }
 .hb-chip--dogru{ background:var(--c-dogru); } .hb-chip--kismen_dogru{ background:var(--c-kismen); }
 .hb-chip--yanlis{ background:var(--c-yanlis); } .hb-chip--dogrulanamaz{ background:var(--c-dogrulanamaz); }
 .hb-chip--mesnetsiz{ background:var(--c-mesnetsiz); } .hb-chip--gorus{ background:var(--c-gorus); }
@@ -121,6 +122,9 @@ footer.wp-block-template-part{ display:none !important; }
 /* ---- Hero (ana sayfa) ---- */
 .home .wp-block-post-content{ padding-top:.5rem; }
 .hb-hero{ max-width:820px; margin:.5rem auto 1.5rem; text-align:center !important; padding:.5rem 1rem 0; }
+.hb-hero__mark{ display:flex; justify-content:center; margin-bottom:.7rem; }
+.hb-hero__mark svg{ width:40px; height:40px; color:var(--hb-accent); opacity:.9; }
+.hb-footer__nav a .hb-ic{ width:1em; height:1em; margin-right:.3em; }
 .hb-hero > *, .hb-hero p, .hb-hero h1{ text-align:center !important; margin-left:auto; margin-right:auto; }
 .hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em;
   color:var(--hb-accent); margin:0 0 .6rem; }

@@ -69,7 +69,9 @@ add_shortcode('haberler_arsiv', function () {
         foreach ($siniflar as $s) $say[$s] = ($say[$s] ?? 0) + 1;
         foreach ($say as $s => $n) {
             $et = ($renk[$s] ?? ['Doğrulanamadı'])[0];
-            $chips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . $et) . '</span>';
+            $chips .= function_exists('haberler_chip')
+                ? haberler_chip($s, $n . ' ' . $et)
+                : '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . $et) . '</span>';
         }
         $kart .= '<article class="hb-kart">';
         $kart .= '<a class="hb-kart__baslik" href="' . esc_url(get_permalink($p)) . '">' . esc_html(get_the_title($p)) . '</a>';

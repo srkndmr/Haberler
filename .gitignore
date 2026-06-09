@@ -10,3 +10,6 @@ wp/.app_password
 n8n/scheduler/.env
 n8n/scheduler/*.log
 n8n/scheduler/seen-urls.txt
+n8n/haberler-pipeline.local.json
+__pycache__/
+*.pyc

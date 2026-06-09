@@ -37,6 +37,27 @@ function haberler_ic($ad) {
          . 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p[$ad] . '</svg>';
 }
 
+/** Sınıflandırmaya özgü küçük rozet ikonu. */
+function haberler_chip_ic($s) {
+    $p = [
+        'dogru'        => '<path d="M5 13l4 4L19 7"/>',
+        'kismen_dogru' => '<circle cx="12" cy="12" r="9"/><path d="M8 12h8"/>',
+        'yanlis'       => '<path d="M6 6l12 12M18 6 6 18"/>',
+        'dogrulanamaz' => '<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.4 2.4 0 1 1 3.3 2.3c-.7.4-.9.8-.9 1.6"/><path d="M12 16.5v.01"/>',
+        'mesnetsiz'    => '<path d="M12 3 2 20h20z"/><path d="M12 10v4"/><path d="M12 17v.01"/>',
+        'gorus'        => '<path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 0 1 12.5 3 8.4 8.4 0 0 1 21 11.5z"/>',
+    ];
+    if (!isset($p[$s])) return '';
+    return '<svg class="hb-chip-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+         . 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p[$s] . '</svg>';
+}
+
+/** Tam rozet (ikon + etiket). $text verilmezse etiketi kullanır (ör. sayı için "2 Görüş"). */
+function haberler_chip($s, $text = null) {
+    $t = $text ?? haberler_etiket($s);
+    return '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . haberler_chip_ic($s) . esc_html($t) . '</span>';
+}
+
 function haberler_dosya_render($content) {
     if (!in_the_loop() || !is_main_query()) return $content;
     $id = get_the_ID();
@@ -55,7 +76,7 @@ function haberler_dosya_render($content) {
             $say = [];
             foreach ($idd as $x) { $s = $x['siniflandirma'] ?? 'dogrulanamaz'; $say[$s] = ($say[$s] ?? 0) + 1; }
             foreach ($say as $s => $n) {
-                $chips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . haberler_etiket($s)) . '</span>';
+                $chips .= haberler_chip($s, $n . ' ' . haberler_etiket($s));
             }
         }
         $ksay  = is_array($kay) ? count($kay) : 0;
@@ -81,7 +102,7 @@ function haberler_dosya_render($content) {
         foreach ($idd as $x) { $s = $x['siniflandirma'] ?? 'dogrulanamaz'; $say[$s] = ($say[$s] ?? 0) + 1; }
         $vchips = '';
         foreach ($say as $s => $n) {
-            $vchips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . haberler_etiket($s)) . '</span>';
+            $vchips .= haberler_chip($s, $n . ' ' . haberler_etiket($s));
         }
         $ks = is_array($kay) ? count($kay) : 0;
         $h .= '<div class="hb-verdict"><div class="hb-verdict__kicker">' . haberler_ic('scale') . 'DOSYA DEĞERLENDİRMESİ</div>'
@@ -98,15 +119,14 @@ function haberler_dosya_render($content) {
         $kullanilan = array_unique(array_map(function ($x) { return $x['siniflandirma'] ?? 'dogrulanamaz'; }, $idd));
         $h .= '<div class="hb-legend">';
         foreach ($kullanilan as $s) {
-            $h .= '<div class="hb-legend-row"><span class="hb-chip hb-chip--' . esc_attr($s) . '">'
-                . esc_html(haberler_etiket($s)) . '</span> ' . esc_html(HABERLER_SINIF_ACIKLAMA[$s] ?? '') . '</div>';
+            $h .= '<div class="hb-legend-row">' . haberler_chip($s) . ' ' . esc_html(HABERLER_SINIF_ACIKLAMA[$s] ?? '') . '</div>';
         }
         $h .= '</div>';
 
         foreach ($idd as $x) {
             $s = $x['siniflandirma'] ?? 'dogrulanamaz';
             $h .= '<div class="hb-iddia hb-iddia--' . esc_attr($s) . '">';
-            $h .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html(haberler_etiket($s)) . '</span>';
+            $h .= haberler_chip($s);
             $h .= '<p class="hb-iddia__metin">' . esc_html($x['iddia_metni'] ?? '') . '</p>';
             if (!empty($x['gerekce']))
                 $h .= '<p class="hb-iddia__satir"><b>Gerekçe:</b> ' . esc_html($x['gerekce']) . '</p>';
@@ -124,7 +144,7 @@ function haberler_dosya_render($content) {
             $url = $k['orijinal_url'] ?? ''; $ad = $k['kaynak_adi'] ?? $url;
             $tar = !empty($k['yayin_tarihi']) ? ' — ' . esc_html($k['yayin_tarihi']) : '';
             $h  .= '<li><strong>' . esc_html($ad) . '</strong>' . $tar;
-            if ($url) $h .= ' · <a href="' . esc_url($url) . '" target="_blank" rel="noopener">orijinal</a>';
+            if ($url) $h .= ' · <a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . haberler_ic('link') . 'orijinal</a>';
             if (!empty($k['arsiv_url'])) $h .= ' · <a href="' . esc_url($k['arsiv_url']) . '" target="_blank" rel="noopener">arşiv</a>';
             $h .= '</li>';
         }
