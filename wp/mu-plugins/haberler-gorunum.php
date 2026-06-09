@@ -57,9 +57,10 @@ function haberler_dosya_render($content) {
 
     // ---- Tekil dosya ----
     $h  = '<div class="hb-dosya">';
-    $h .= '<p class="hb-disclaimer hb-disclaimer--top"><strong>Not:</strong> Bu bir doğruluk denetimi '
-        . 'dosyasıdır; iddialar kaynağına atfedilmiştir. Hukuki/cezai nitelemeler mahkemelerin işidir, '
-        . 'kesin hüküm değildir.</p>';
+    $h .= '<p class="hb-disclaimer hb-disclaimer--top"><strong>Not:</strong> Bu dosya, kamuya açık '
+        . 'haberlerde öne sürülen iddiaların bağımsız bir değerlendirmesidir. Aktarılan iddialar ilgili '
+        . 'kaynaklara aittir; bir kişinin suçlu olup olmadığına ilişkin nihai takdir yalnızca yargı '
+        . 'mercilerine aittir. Değerlendirmelerimiz kesin hüküm niteliği taşımaz.</p>';
 
     // Değerlendirme kutusu (görsel anchor)
     if (is_array($idd) && $idd) {
@@ -117,9 +118,10 @@ function haberler_dosya_render($content) {
         $h .= '</ul>';
     }
 
-    $h .= '<p class="hb-disclaimer hb-disclaimer--bottom">Bu içerik bağımsız bir medya izleme/doğruluk '
-        . 'denetimi çalışmasıdır ve insan editör onayından geçmiştir. Düzeltme talepleri için İletişim '
-        . 'sayfasını kullanın.</p>';
+    $h .= '<p class="hb-disclaimer hb-disclaimer--bottom">Bu çalışma bağımsız bir medya izleme ve '
+        . 'doğruluk denetimi faaliyetidir; bir editör incelemesinden geçmiştir ve hukuki görüş niteliği '
+        . 'taşımaz. Bir hata olduğunu düşünüyorsanız İletişim / Düzeltme Talebi sayfasından bildirebilirsiniz; '
+        . 'her başvuru insan eliyle değerlendirilir.</p>';
     $h .= '</div>';
     return $content . $h;
 }

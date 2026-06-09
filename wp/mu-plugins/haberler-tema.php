@@ -39,13 +39,15 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 /* Başlıklar + okuma kolonu */
 .entry-title, .wp-block-post-title{ font-family:var(--serif); font-weight:700; letter-spacing:-.018em;
   line-height:1.18; color:var(--hb-ink); font-size:clamp(1.9rem,4vw,2.7rem); max-width:880px; margin-inline:auto; }
-.entry-content, .wp-block-post-content{ max-width:720px; margin-inline:auto; font-size:1.12rem; color:var(--hb-text); }
+.entry-content, .wp-block-post-content{ font-size:1.12rem; color:var(--hb-text); }
+/* Anasayfada tema sayfa başlığını gizle (hero kendi başlığını taşır) */
+.home .wp-block-post-title, .home .entry-title{ display:none; }
 .entry-content h2, .wp-block-post-content h2{ font-family:var(--serif); color:var(--hb-ink); font-weight:600;
   font-size:1.5rem; letter-spacing:-.01em; margin-top:2.1rem; padding-bottom:.3rem; border-bottom:2px solid var(--hb-soft); }
 .entry-content p{ margin:.9rem 0; }
 
 /* ---- Dosya ---- */
-.hb-dosya{ margin-top:2.2rem; }
+.hb-dosya{ max-width:740px; margin:2.2rem auto 0; }
 .hb-disclaimer{ font-size:.92rem; border-radius:12px; padding:12px 16px; margin:12px 0 18px; }
 .hb-disclaimer--top{ background:#fff8e6; border:1px solid #f3d27a; color:#6b5200; }
 .hb-disclaimer--bottom{ background:var(--hb-soft); border:1px solid var(--hb-line); color:var(--hb-muted); font-size:.88rem; }
@@ -116,8 +118,11 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
   padding:10px 22px; border-radius:999px; margin-right:14px; }
 .hb-hero__cta:hover{ background:var(--hb-accent2); text-decoration:none; }
 
-/* ---- Kart ızgarası ---- */
-.hb-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; margin:1.2rem 0; }
+/* ---- Bölüm + Kart ızgarası ---- */
+.hb-section{ max-width:1080px; margin:2.4rem auto 0; padding-inline:1rem; }
+.hb-section__title{ font-family:var(--serif); font-weight:600; font-size:1.7rem; color:var(--hb-ink);
+  text-align:center; margin:0 0 1.2rem; }
+.hb-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px; margin:0; }
 .hb-kart__ozet{ color:var(--hb-text); font-size:.96rem; margin:.5rem 0 .7rem; }
 .hb-kart__chips{ margin-top:.4rem; }
 

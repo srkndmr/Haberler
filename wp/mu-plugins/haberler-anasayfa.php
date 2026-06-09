@@ -6,15 +6,16 @@
 if (!defined('ABSPATH')) exit;
 
 add_shortcode('haberler_son_dosyalar', function ($atts) {
-    $a = shortcode_atts(['limit' => 9], $atts);
+    $a = shortcode_atts(['limit' => 9, 'baslik' => ''], $atts);
     $q = new WP_Query([
         'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => (int) $a['limit'],
         'meta_query' => [['key' => 'haberler_ozet', 'compare' => 'EXISTS']],
     ]);
-    if (!$q->have_posts()) { wp_reset_postdata(); return '<p>Henüz yayımlanmış dosya yok.</p>'; }
+    $bas = $a['baslik'] ? '<h2 class="hb-section__title">' . esc_html($a['baslik']) . '</h2>' : '';
+    if (!$q->have_posts()) { wp_reset_postdata(); return '<section class="hb-section">' . $bas . '<p>Henüz yayımlanmış dosya yok.</p></section>'; }
 
     $etk = function ($s) { return function_exists('haberler_etiket') ? haberler_etiket($s) : $s; };
-    $out = '<div class="hb-grid">';
+    $out = '<section class="hb-section">' . $bas . '<div class="hb-grid">';
     foreach ($q->posts as $p) {
         $idd  = json_decode((string) get_post_meta($p->ID, 'haberler_iddialar', true), true) ?: [];
         $kay  = json_decode((string) get_post_meta($p->ID, 'haberler_kaynaklar', true), true) ?: [];
@@ -32,7 +33,7 @@ add_shortcode('haberler_son_dosyalar', function ($atts) {
         if ($ozet) $out .= '<p class="hb-kart__ozet">' . esc_html(mb_substr($ozet, 0, 150) . (mb_strlen($ozet) > 150 ? '…' : '')) . '</p>';
         $out .= '<div class="hb-kart__chips">' . $chips . '</div></article>';
     }
-    $out .= '</div>';
+    $out .= '</div></section>';
     wp_reset_postdata();
     return $out;
 });
