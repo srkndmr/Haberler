@@ -61,6 +61,21 @@ function haberler_dosya_render($content) {
         . 'dosyasıdır; iddialar kaynağına atfedilmiştir. Hukuki/cezai nitelemeler mahkemelerin işidir, '
         . 'kesin hüküm değildir.</p>';
 
+    // Değerlendirme kutusu (görsel anchor)
+    if (is_array($idd) && $idd) {
+        $say = [];
+        foreach ($idd as $x) { $s = $x['siniflandirma'] ?? 'dogrulanamaz'; $say[$s] = ($say[$s] ?? 0) + 1; }
+        $vchips = '';
+        foreach ($say as $s => $n) {
+            $vchips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . haberler_etiket($s)) . '</span>';
+        }
+        $ks = is_array($kay) ? count($kay) : 0;
+        $h .= '<div class="hb-verdict"><div class="hb-verdict__kicker">Dosya Değerlendirmesi</div>'
+            . '<div class="hb-verdict__chips">' . $vchips . '</div>'
+            . '<div class="hb-verdict__note">' . esc_html(count($idd)) . ' iddia incelendi'
+            . ($ks ? ' · ' . esc_html($ks) . ' kaynak' : '') . '</div></div>';
+    }
+
     if ($ozet) $h .= '<h2>Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
     if ($gd)   $h .= '<h2>Genel Değerlendirme</h2><div class="hb-gd">' . nl2br(esc_html($gd)) . '</div>';
 
