@@ -32,7 +32,8 @@ a{ color:var(--hb-accent); text-underline-offset:2px; } a:hover{ color:var(--hb-
 /* Masthead (tema başlığı + menü) */
 .wp-block-site-title{ font-family:var(--serif)!important; font-weight:700; letter-spacing:-.01em; }
 .wp-block-site-title a{ color:var(--hb-ink)!important; text-decoration:none; }
-.wp-block-navigation{ font-family:var(--sans); font-weight:500; font-size:.96rem; }
+.wp-block-navigation{ font-family:var(--sans); font-weight:500; font-size:.92rem; }
+.wp-block-navigation__container{ flex-wrap:wrap; }
 .wp-block-navigation a{ color:var(--hb-text)!important; }
 header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid var(--hb-line); }
 
@@ -42,6 +43,9 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 .entry-content, .wp-block-post-content{ font-size:1.12rem; color:var(--hb-text); }
 /* Anasayfada tema sayfa başlığını gizle (hero kendi başlığını taşır) */
 .home .wp-block-post-title, .home .entry-title{ display:none; }
+/* Anasayfada tema'nın çift büyük üst boşluğunu kıs */
+.home main.wp-block-group{ margin-top:1.2rem !important; }
+.home main .wp-block-group.alignfull.has-global-padding{ padding-top:0 !important; }
 .entry-content h2, .wp-block-post-content h2{ font-family:var(--serif); color:var(--hb-ink); font-weight:600;
   font-size:1.5rem; letter-spacing:-.01em; margin-top:2.1rem; padding-bottom:.3rem; border-bottom:2px solid var(--hb-soft); }
 .entry-content p{ margin:.9rem 0; }
