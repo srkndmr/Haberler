@@ -34,25 +34,20 @@ add_shortcode('haberler_arsiv', function () {
     ksort($kaynaklar);
 
     // ---- Filtre formu ----
-    $h = '<form method="get" class="haberler-filtre" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:1rem 0;padding:12px;background:#f6f8fa;border-radius:8px">';
-    // Sınıflandırma
-    $h .= '<label style="font-size:.85rem">Sınıflandırma<br><select name="f_sinif" style="padding:6px">';
-    $h .= '<option value="">— hepsi —</option>';
+    $h = '<form method="get" class="hb-filtre">';
+    $h .= '<label>Sınıflandırma<br><select name="f_sinif"><option value="">— hepsi —</option>';
     foreach ($renk as $val => $r) {
         $h .= '<option value="' . esc_attr($val) . '" ' . selected($f_sinif, $val, false) . '>' . esc_html($r[0]) . '</option>';
     }
     $h .= '</select></label>';
-    // Kaynak
-    $h .= '<label style="font-size:.85rem">Kaynak<br><select name="f_kaynak" style="padding:6px">';
-    $h .= '<option value="">— hepsi —</option>';
+    $h .= '<label>Kaynak<br><select name="f_kaynak"><option value="">— hepsi —</option>';
     foreach (array_keys($kaynaklar) as $kn) {
         $h .= '<option value="' . esc_attr($kn) . '" ' . selected($f_kaynak, $kn, false) . '>' . esc_html($kn) . '</option>';
     }
     $h .= '</select></label>';
-    // Tarih (yıl-ay)
-    $h .= '<label style="font-size:.85rem">Tarih (YYYY-AA)<br><input type="text" name="f_tarih" value="' . esc_attr($f_tarih) . '" placeholder="2026-06" style="padding:6px"></label>';
-    $h .= '<button type="submit" style="padding:7px 16px;background:#1f2937;color:#fff;border:0;border-radius:6px;cursor:pointer">Filtrele</button>';
-    if ($f_sinif || $f_kaynak || $f_tarih) $h .= '<a href="' . esc_url(get_permalink()) . '" style="font-size:.85rem;align-self:center">temizle</a>';
+    $h .= '<label>Tarih (YYYY-AA)<br><input type="text" name="f_tarih" value="' . esc_attr($f_tarih) . '" placeholder="2026-06"></label>';
+    $h .= '<button type="submit" class="hb-btn">Filtrele</button>';
+    if ($f_sinif || $f_kaynak || $f_tarih) $h .= '<a href="' . esc_url(get_permalink()) . '">temizle</a>';
     $h .= '</form>';
 
     // ---- Liste ----
@@ -73,17 +68,17 @@ add_shortcode('haberler_arsiv', function () {
         $say = [];
         foreach ($siniflar as $s) $say[$s] = ($say[$s] ?? 0) + 1;
         foreach ($say as $s => $n) {
-            [$et, $rk] = $renk[$s] ?? ['Doğrulanamaz', '#57606a'];
-            $chips .= '<span style="display:inline-block;background:' . esc_attr($rk) . ';color:#fff;font-size:.7rem;font-weight:700;padding:1px 7px;border-radius:4px;margin:2px 4px 0 0">' . esc_html($n . ' ' . $et) . '</span>';
+            $et = ($renk[$s] ?? ['Doğrulanamadı'])[0];
+            $chips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . $et) . '</span>';
         }
-        $kart .= '<article style="border:1px solid #e5e7eb;border-radius:8px;padding:14px;margin:12px 0">';
-        $kart .= '<a href="' . esc_url(get_permalink($p)) . '" style="font-size:1.1rem;font-weight:700;text-decoration:none">' . esc_html(get_the_title($p)) . '</a>';
-        $kart .= '<div style="font-size:.8rem;color:#666;margin:4px 0">' . esc_html(get_the_date('d.m.Y', $p));
+        $kart .= '<article class="hb-kart">';
+        $kart .= '<a class="hb-kart__baslik" href="' . esc_url(get_permalink($p)) . '">' . esc_html(get_the_title($p)) . '</a>';
+        $kart .= '<div class="hb-kart__meta">' . esc_html(get_the_date('d.m.Y', $p));
         if ($knames) $kart .= ' · ' . esc_html(implode(', ', array_unique($knames)));
         $kart .= '</div><div>' . $chips . '</div></article>';
     }
     wp_reset_postdata();
 
-    $bilgi = '<p style="font-size:.85rem;color:#666">' . esc_html($sayi) . ' dosya listeleniyor.</p>';
+    $bilgi = '<p class="hb-kaynak-sayi">' . esc_html($sayi) . ' dosya listeleniyor.</p>';
     return $h . $bilgi . ($kart ?: '<p>Filtreye uyan dosya bulunamadı.</p>');
 });

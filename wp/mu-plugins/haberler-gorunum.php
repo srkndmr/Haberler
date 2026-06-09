@@ -1,8 +1,7 @@
 <?php
 /**
  * Plugin Name: Haberler — Dosya Görünümü (ön yüz)
- * Description: Dosya meta'sını (özet, iddialar+sınıflandırma, kaynaklar, feragatname)
- *              yazı içeriğinin altında ön yüzde render eder.
+ * Description: Dosya meta'sını tasarlanmış kart/panel olarak render eder (stil: haberler-tema.php).
  */
 if (!defined('ABSPATH')) exit;
 
@@ -11,9 +10,8 @@ const HABERLER_SINIF_RENK = [
     'kismen_dogru' => ['Kısmen Doğru', '#9a6700'],
     'yanlis'       => ['Yanlış', '#cf222e'],
     'dogrulanamaz' => ['Doğrulanamadı', '#57606a'],
-    'gorus'        => ['Görüş', '#8250df'],
+    'gorus'        => ['Görüş', '#7c3aed'],
 ];
-
 const HABERLER_SINIF_ACIKLAMA = [
     'dogru'        => 'Güvenilir kanıtla doğrulandı.',
     'kismen_dogru' => 'Bir kısmı doğru; bir kısmı eksik, yanlış veya bağlamından kopuk.',
@@ -22,93 +20,77 @@ const HABERLER_SINIF_ACIKLAMA = [
     'gorus'        => 'Olgu değil; yorum, değerlendirme veya değer yargısı.',
 ];
 
+function haberler_etiket($s) { return HABERLER_SINIF_RENK[$s][0] ?? 'Doğrulanamadı'; }
+
 function haberler_dosya_render($content) {
     if (!in_the_loop() || !is_main_query()) return $content;
     $id = get_the_ID();
     if (get_post_type($id) !== 'post') return $content;
 
-    $ozet  = get_post_meta($id, 'haberler_ozet', true);
-    $kay   = json_decode((string) get_post_meta($id, 'haberler_kaynaklar', true), true);
-    $idd   = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
-    $isim  = get_post_meta($id, 'haberler_isim_verilen_suclama', true);
-    $gd    = get_post_meta($id, 'haberler_genel_degerlendirme', true);
-    if (!$ozet && !$kay && !$idd) return $content; // dosya değil → dokunma
+    $ozet = get_post_meta($id, 'haberler_ozet', true);
+    $kay  = json_decode((string) get_post_meta($id, 'haberler_kaynaklar', true), true);
+    $idd  = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
+    $gd   = get_post_meta($id, 'haberler_genel_degerlendirme', true);
+    if (!$ozet && !$kay && !$idd) return $content;
 
-    // LİSTELEME (anasayfa/arşiv): kompakt özet + sınıflandırma rozetleri
+    // ---- Listeleme (akış/arşiv) ----
     if (!is_singular('post')) {
         $chips = '';
         if (is_array($idd)) {
             $say = [];
             foreach ($idd as $x) { $s = $x['siniflandirma'] ?? 'dogrulanamaz'; $say[$s] = ($say[$s] ?? 0) + 1; }
             foreach ($say as $s => $n) {
-                [$et, $rk] = HABERLER_SINIF_RENK[$s] ?? ['Doğrulanamaz', '#57606a'];
-                $chips .= '<span style="display:inline-block;background:' . esc_attr($rk) . ';color:#fff;font-size:.72rem;'
-                       .  'font-weight:700;padding:2px 8px;border-radius:4px;margin:2px 4px 2px 0">' . esc_html($n . ' ' . $et) . '</span>';
+                $chips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . haberler_etiket($s)) . '</span>';
             }
         }
         $ksay  = is_array($kay) ? count($kay) : 0;
         $ozetk = $ozet ? mb_substr($ozet, 0, 220) . (mb_strlen($ozet) > 220 ? '…' : '') : '';
-        $out   = '<div class="haberler-ozet" style="margin:.5rem 0">';
-        if ($ozetk) $out .= '<p>' . esc_html($ozetk) . '</p>';
-        if ($chips) $out .= '<p style="margin:.4rem 0">' . $chips . '</p>';
-        if ($ksay)  $out .= '<p style="font-size:.8rem;color:#666">' . esc_html($ksay) . ' kaynak</p>';
-        $out  .= '</div>';
-        return $out;
+        $o = '<div class="hb-ozet-kart">';
+        if ($ozetk) $o .= '<p>' . esc_html($ozetk) . '</p>';
+        if ($chips) $o .= '<p>' . $chips . '</p>';
+        if ($ksay)  $o .= '<p class="hb-kaynak-sayi">' . esc_html($ksay) . ' kaynak</p>';
+        $o .= '</div>';
+        return $o;
     }
 
-    $h  = '<div class="haberler-dosya" style="margin-top:2rem;border-top:2px solid #e5e7eb;padding-top:1.5rem">';
+    // ---- Tekil dosya ----
+    $h  = '<div class="hb-dosya">';
+    $h .= '<p class="hb-disclaimer hb-disclaimer--top"><strong>Not:</strong> Bu bir doğruluk denetimi '
+        . 'dosyasıdır; iddialar kaynağına atfedilmiştir. Hukuki/cezai nitelemeler mahkemelerin işidir, '
+        . 'kesin hüküm değildir.</p>';
 
-    // Üst feragatname
-    $h .= '<p style="background:#fff8e1;border-left:4px solid #f59e0b;padding:10px 14px;font-size:.9rem;color:#5a4a00">'
-        . '<strong>Not:</strong> Bu bir doğruluk denetimi dosyasıdır; iddialar kaynağına atfedilmiştir. '
-        . 'Hukuki/cezai nitelemeler mahkemelerin işidir, kesin hüküm değildir.</p>';
-
-    if ($ozet) {
-        $h .= '<h2>Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
-    }
-
-    if ($gd) {
-        $h .= '<h2>Genel Değerlendirme</h2>';
-        $h .= '<div style="background:#f0f4f8;border-left:4px solid #1f2937;padding:12px 16px;border-radius:6px;line-height:1.6">'
-            . nl2br(esc_html($gd)) . '</div>';
-    }
+    if ($ozet) $h .= '<h2>Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
+    if ($gd)   $h .= '<h2>Genel Değerlendirme</h2><div class="hb-gd">' . nl2br(esc_html($gd)) . '</div>';
 
     if (is_array($idd) && $idd) {
         $h .= '<h2>İddialar ve Değerlendirme</h2>';
-
-        // Bu dosyada kullanılan sınıflandırmaların açıklama lejantı
         $kullanilan = array_unique(array_map(function ($x) { return $x['siniflandirma'] ?? 'dogrulanamaz'; }, $idd));
-        $h .= '<div style="font-size:.82rem;background:#fafafa;border:1px solid #eee;border-radius:6px;padding:8px 12px;margin:8px 0">';
+        $h .= '<div class="hb-legend">';
         foreach ($kullanilan as $s) {
-            [$et, $rk] = HABERLER_SINIF_RENK[$s] ?? ['Doğrulanamadı', '#57606a'];
-            $ac = HABERLER_SINIF_ACIKLAMA[$s] ?? '';
-            $h .= '<div style="margin:3px 0"><span style="display:inline-block;background:' . esc_attr($rk)
-                . ';color:#fff;font-size:.68rem;font-weight:700;padding:1px 7px;border-radius:4px">' . esc_html($et)
-                . '</span> <span style="color:#555">' . esc_html($ac) . '</span></div>';
+            $h .= '<div class="hb-legend-row"><span class="hb-chip hb-chip--' . esc_attr($s) . '">'
+                . esc_html(haberler_etiket($s)) . '</span> ' . esc_html(HABERLER_SINIF_ACIKLAMA[$s] ?? '') . '</div>';
         }
         $h .= '</div>';
 
         foreach ($idd as $x) {
             $s = $x['siniflandirma'] ?? 'dogrulanamaz';
-            [$etiket, $renk] = HABERLER_SINIF_RENK[$s] ?? ['Doğrulanamaz', '#57606a'];
-            $h .= '<div style="border-left:4px solid ' . esc_attr($renk) . ';padding:8px 14px;margin:12px 0;background:#f6f8fa">';
-            $h .= '<span style="display:inline-block;background:' . esc_attr($renk) . ';color:#fff;font-size:.7rem;'
-                . 'font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:4px">' . esc_html($etiket) . '</span>';
-            $h .= '<p style="margin:8px 0 4px;font-weight:600">' . esc_html($x['iddia_metni'] ?? '') . '</p>';
-            if (!empty($x['gerekce'])) $h .= '<p style="margin:4px 0;color:#444"><em>Gerekçe:</em> ' . esc_html($x['gerekce']) . '</p>';
-            if (!empty($x['dayanak_kaynak_url'])) {
-                $h .= '<p style="margin:4px 0;font-size:.85rem"><em>Dayanak:</em> <a href="' . esc_url($x['dayanak_kaynak_url'])
-                    . '" target="_blank" rel="noopener">' . esc_html($x['dayanak_kaynak_url']) . '</a></p>';
-            }
+            $h .= '<div class="hb-iddia hb-iddia--' . esc_attr($s) . '">';
+            $h .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html(haberler_etiket($s)) . '</span>';
+            $h .= '<p class="hb-iddia__metin">' . esc_html($x['iddia_metni'] ?? '') . '</p>';
+            if (!empty($x['gerekce']))
+                $h .= '<p class="hb-iddia__satir"><b>Gerekçe:</b> ' . esc_html($x['gerekce']) . '</p>';
+            if (!empty($x['dayanak_kaynak_url']))
+                $h .= '<p class="hb-iddia__satir hb-iddia__dayanak"><b>Dayanak:</b> <a href="'
+                    . esc_url($x['dayanak_kaynak_url']) . '" target="_blank" rel="noopener">'
+                    . esc_html($x['dayanak_kaynak_url']) . '</a></p>';
             $h .= '</div>';
         }
     }
 
     if (is_array($kay) && $kay) {
-        $h .= '<h2>Kaynaklar</h2><ul>';
+        $h .= '<h2>Kaynaklar</h2><ul class="hb-kaynaklar">';
         foreach ($kay as $k) {
-            $url = $k['orijinal_url'] ?? '';
-            $ad  = $k['kaynak_adi'] ?? $url;
+            $url = $k['orijinal_url'] ?? ''; $ad = $k['kaynak_adi'] ?? $url;
             $tar = !empty($k['yayin_tarihi']) ? ' — ' . esc_html($k['yayin_tarihi']) : '';
             $h  .= '<li><strong>' . esc_html($ad) . '</strong>' . $tar;
             if ($url) $h .= ' · <a href="' . esc_url($url) . '" target="_blank" rel="noopener">orijinal</a>';
@@ -118,11 +100,9 @@ function haberler_dosya_render($content) {
         $h .= '</ul>';
     }
 
-    // Alt feragatname
-    $h .= '<p style="margin-top:1.5rem;font-size:.85rem;color:#666;border-top:1px solid #eee;padding-top:10px">'
-        . 'Bu içerik bağımsız bir medya izleme/doğruluk denetimi çalışmasıdır ve insan editör onayından geçmiştir. '
-        . 'Düzeltme talepleri için İletişim sayfasını kullanın.</p>';
-
+    $h .= '<p class="hb-disclaimer hb-disclaimer--bottom">Bu içerik bağımsız bir medya izleme/doğruluk '
+        . 'denetimi çalışmasıdır ve insan editör onayından geçmiştir. Düzeltme talepleri için İletişim '
+        . 'sayfasını kullanın.</p>';
     $h .= '</div>';
     return $content . $h;
 }
