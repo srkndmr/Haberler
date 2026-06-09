@@ -36,6 +36,9 @@ a{ color:var(--hb-accent); text-underline-offset:2px; } a:hover{ color:var(--hb-
 .wp-block-navigation__container{ flex-wrap:wrap; }
 .wp-block-navigation a{ color:var(--hb-text)!important; }
 header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid var(--hb-line); }
+/* Tema'nın varsayılan footer'ını (demo linkler + "Designed with WordPress") gizle;
+   yalnızca kendi footer'ımız (footer.hb-footer) kalsın */
+footer.wp-block-template-part{ display:none !important; }
 
 /* Başlıklar + okuma kolonu */
 .entry-title, .wp-block-post-title{ font-family:var(--serif); font-weight:700; letter-spacing:-.018em;
@@ -113,12 +116,14 @@ header.wp-block-template-part, .wp-site-blocks > header{ border-bottom:1px solid
 
 /* ---- Hero (ana sayfa) ---- */
 .home .wp-block-post-content{ padding-top:.5rem; }
-.hb-hero{ max-width:880px; margin:.5rem auto 1.5rem; text-align:center; padding:.5rem 1rem 0; }
+.hb-hero{ max-width:820px; margin:.5rem auto 1.5rem; text-align:center; padding:.5rem 1rem 0; }
+.hb-hero > *{ text-align:center; }
 .hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em;
   color:var(--hb-accent); margin:0 0 .6rem; }
 .hb-hero__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.02em; line-height:1.12;
-  font-size:clamp(2rem,5vw,3.1rem); color:var(--hb-ink); margin:.2rem 0 .8rem; }
-.hb-hero__sub{ font-size:1.15rem; color:var(--hb-muted); max-width:60ch; margin:0 auto 1.1rem; }
+  font-size:clamp(2rem,5vw,3.1rem); color:var(--hb-ink); margin:.2rem auto .8rem; text-wrap:balance; }
+.hb-hero__sub{ font-size:1.12rem; color:var(--hb-muted); max-width:52ch; margin:0 auto 1.2rem;
+  text-align:center; text-wrap:balance; }
 .hb-hero__cta{ display:inline-block; background:var(--hb-accent); color:#fff!important; font-weight:600;
   padding:10px 22px; border-radius:999px; margin-right:14px; }
 .hb-hero__cta:hover{ background:var(--hb-accent2); text-decoration:none; }
