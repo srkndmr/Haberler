@@ -15,14 +15,37 @@ const HABERLER_SINIF_RENK = [
 ];
 
 function haberler_dosya_render($content) {
-    if (!is_singular('post') || !in_the_loop() || !is_main_query()) return $content;
+    if (!in_the_loop() || !is_main_query()) return $content;
+    $id = get_the_ID();
+    if (get_post_type($id) !== 'post') return $content;
 
-    $id    = get_the_ID();
     $ozet  = get_post_meta($id, 'haberler_ozet', true);
     $kay   = json_decode((string) get_post_meta($id, 'haberler_kaynaklar', true), true);
     $idd   = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
     $isim  = get_post_meta($id, 'haberler_isim_verilen_suclama', true);
     if (!$ozet && !$kay && !$idd) return $content; // dosya değil → dokunma
+
+    // LİSTELEME (anasayfa/arşiv): kompakt özet + sınıflandırma rozetleri
+    if (!is_singular('post')) {
+        $chips = '';
+        if (is_array($idd)) {
+            $say = [];
+            foreach ($idd as $x) { $s = $x['siniflandirma'] ?? 'dogrulanamaz'; $say[$s] = ($say[$s] ?? 0) + 1; }
+            foreach ($say as $s => $n) {
+                [$et, $rk] = HABERLER_SINIF_RENK[$s] ?? ['Doğrulanamaz', '#57606a'];
+                $chips .= '<span style="display:inline-block;background:' . esc_attr($rk) . ';color:#fff;font-size:.72rem;'
+                       .  'font-weight:700;padding:2px 8px;border-radius:4px;margin:2px 4px 2px 0">' . esc_html($n . ' ' . $et) . '</span>';
+            }
+        }
+        $ksay  = is_array($kay) ? count($kay) : 0;
+        $ozetk = $ozet ? mb_substr($ozet, 0, 220) . (mb_strlen($ozet) > 220 ? '…' : '') : '';
+        $out   = '<div class="haberler-ozet" style="margin:.5rem 0">';
+        if ($ozetk) $out .= '<p>' . esc_html($ozetk) . '</p>';
+        if ($chips) $out .= '<p style="margin:.4rem 0">' . $chips . '</p>';
+        if ($ksay)  $out .= '<p style="font-size:.8rem;color:#666">' . esc_html($ksay) . ' kaynak</p>';
+        $out  .= '</div>';
+        return $out;
+    }
 
     $h  = '<div class="haberler-dosya" style="margin-top:2rem;border-top:2px solid #e5e7eb;padding-top:1.5rem">';
 
