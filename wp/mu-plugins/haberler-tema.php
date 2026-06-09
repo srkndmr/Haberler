@@ -53,6 +53,10 @@ footer.wp-block-template-part{ display:none !important; }
   font-size:1.5rem; letter-spacing:-.01em; margin-top:2.1rem; padding-bottom:.3rem; border-bottom:2px solid var(--hb-soft); }
 .entry-content p{ margin:.9rem 0; }
 
+/* İkonlar (ince çizgi) */
+.hb-ic{ width:1.05em; height:1.05em; vertical-align:-.16em; margin-right:.45em; color:var(--hb-accent); }
+.hb-verdict__kicker .hb-ic{ width:1em; height:1em; margin-right:.35em; }
+
 /* ---- Dosya ---- */
 .hb-dosya{ max-width:740px; margin:2.2rem auto 0; }
 .hb-disclaimer{ font-size:.92rem; border-radius:12px; padding:12px 16px; margin:12px 0 18px; }

@@ -24,6 +24,19 @@ const HABERLER_SINIF_ACIKLAMA = [
 
 function haberler_etiket($s) { return HABERLER_SINIF_RENK[$s][0] ?? 'Doğrulanamadı'; }
 
+/** İnce çizgi (line) SVG ikon — currentColor ile çizilir, harici istek yok. */
+function haberler_ic($ad) {
+    $p = [
+        'doc'   => '<path d="M14 3v5h5"/><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/>',
+        'scale' => '<path d="M12 3v18"/><path d="M8 21h8"/><path d="M3 7h18"/><path d="M7 7l-3 6a3 3 0 0 0 6 0z"/><path d="M17 7l-3 6a3 3 0 0 0 6 0z"/>',
+        'check' => '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 11l2.5 2.5L16 8"/>',
+        'link'  => '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+    ];
+    if (!isset($p[$ad])) return '';
+    return '<svg class="hb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" '
+         . 'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $p[$ad] . '</svg>';
+}
+
 function haberler_dosya_render($content) {
     if (!in_the_loop() || !is_main_query()) return $content;
     $id = get_the_ID();
@@ -71,17 +84,17 @@ function haberler_dosya_render($content) {
             $vchips .= '<span class="hb-chip hb-chip--' . esc_attr($s) . '">' . esc_html($n . ' ' . haberler_etiket($s)) . '</span>';
         }
         $ks = is_array($kay) ? count($kay) : 0;
-        $h .= '<div class="hb-verdict"><div class="hb-verdict__kicker">DOSYA DEĞERLENDİRMESİ</div>'
+        $h .= '<div class="hb-verdict"><div class="hb-verdict__kicker">' . haberler_ic('scale') . 'DOSYA DEĞERLENDİRMESİ</div>'
             . '<div class="hb-verdict__chips">' . $vchips . '</div>'
             . '<div class="hb-verdict__note">' . esc_html(count($idd)) . ' iddia incelendi'
             . ($ks ? ' · ' . esc_html($ks) . ' kaynak' : '') . '</div></div>';
     }
 
-    if ($ozet) $h .= '<h2>Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
-    if ($gd)   $h .= '<h2>Genel Değerlendirme</h2><div class="hb-gd">' . nl2br(esc_html($gd)) . '</div>';
+    if ($ozet) $h .= '<h2>' . haberler_ic('doc') . 'Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
+    if ($gd)   $h .= '<h2>' . haberler_ic('scale') . 'Genel Değerlendirme</h2><div class="hb-gd">' . nl2br(esc_html($gd)) . '</div>';
 
     if (is_array($idd) && $idd) {
-        $h .= '<h2>İddialar ve Değerlendirme</h2>';
+        $h .= '<h2>' . haberler_ic('check') . 'İddialar ve Değerlendirme</h2>';
         $kullanilan = array_unique(array_map(function ($x) { return $x['siniflandirma'] ?? 'dogrulanamaz'; }, $idd));
         $h .= '<div class="hb-legend">';
         foreach ($kullanilan as $s) {
@@ -106,7 +119,7 @@ function haberler_dosya_render($content) {
     }
 
     if (is_array($kay) && $kay) {
-        $h .= '<h2>Kaynaklar</h2><ul class="hb-kaynaklar">';
+        $h .= '<h2>' . haberler_ic('link') . 'Kaynaklar</h2><ul class="hb-kaynaklar">';
         foreach ($kay as $k) {
             $url = $k['orijinal_url'] ?? ''; $ad = $k['kaynak_adi'] ?? $url;
             $tar = !empty($k['yayin_tarihi']) ? ' — ' . esc_html($k['yayin_tarihi']) : '';
