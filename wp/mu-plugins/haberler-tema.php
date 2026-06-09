@@ -116,8 +116,8 @@ footer.wp-block-template-part{ display:none !important; }
 
 /* ---- Hero (ana sayfa) ---- */
 .home .wp-block-post-content{ padding-top:.5rem; }
-.hb-hero{ max-width:820px; margin:.5rem auto 1.5rem; text-align:center; padding:.5rem 1rem 0; }
-.hb-hero > *{ text-align:center; }
+.hb-hero{ max-width:820px; margin:.5rem auto 1.5rem; text-align:center !important; padding:.5rem 1rem 0; }
+.hb-hero > *, .hb-hero p, .hb-hero h1{ text-align:center !important; margin-left:auto; margin-right:auto; }
 .hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em;
   color:var(--hb-accent); margin:0 0 .6rem; }
 .hb-hero__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.02em; line-height:1.12;
