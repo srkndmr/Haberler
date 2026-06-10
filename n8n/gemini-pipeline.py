@@ -8,7 +8,7 @@ Kullanım:
   cd n8n && . ./scheduler/.env && python3 gemini-pipeline.py "BAŞLIK" ["bağlam"]
 Argümansız: Google News'ten güncel bir FETÖ haberi çeker.
 """
-import os, re, sys, json, base64, importlib.util, urllib.request, urllib.error
+import os, re, sys, json, time, base64, importlib.util, urllib.request, urllib.error
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 def _load(name, fn):
@@ -23,6 +23,7 @@ APP = os.environ.get("WP_APP_PASS")
 
 def resolve(u):
     """grounding redirect linkini gerçek mecra URL'sine çöz (best-effort)."""
+    u = (u or "").split(",")[0].strip()  # Gemini bazen birden çok URL'yi virgülle birleştirir
     if not u or "grounding-api-redirect" not in u: return u
     try:
         r = urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"}), timeout=12)
@@ -60,11 +61,14 @@ def main():
         if not items: print("Google News'ten haber gelmedi."); sys.exit(1)
         baslik = items[0]["baslik"]; metin = items[0].get("ozet", "")
     print(f"BAŞLIK: {baslik}\nGemini grounded analiz...")
-    analiz, sources, queries = gem.gemini_grounded(baslik, metin, KEY, MODEL)
-    # Boş/ayrıştırılamayan sonuçta bir kez daha dene
-    if not analiz.get("ozet") and not analiz.get("iddialar"):
-        print("  (boş sonuç — bir kez daha deneniyor)")
+    # Gemini grounded kararsız olabilir (bazen boş döner); dolu sonuç gelene dek birkaç kez dene
+    analiz, sources, queries = {}, [], []
+    for attempt in range(4):
         analiz, sources, queries = gem.gemini_grounded(baslik, metin, KEY, MODEL)
+        if analiz.get("ozet") or analiz.get("iddialar"):
+            break
+        print(f"  (boş sonuç, tekrar {attempt + 1}/4)")
+        time.sleep(5)
     # Hâlâ boşsa WP'ye YAZMA (boş dosya oluşturma)
     if not analiz.get("ozet") and not analiz.get("iddialar"):
         print("✗ Gemini yapılandırılmış sonuç döndürmedi; WP'ye yazılmadı. Sonra tekrar denenebilir.")
