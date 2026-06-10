@@ -8,7 +8,7 @@ Kullanım:
   cd n8n && . ./scheduler/.env && python3 gemini-analiz.py "BAŞLIK" "isteğe bağlı bağlam"
 Argüman verilmezse örnek bir başlıkla çalışır.
 """
-import os, re, sys, json, urllib.request
+import os, re, sys, json, time, html, urllib.request, urllib.error
 
 SISTEM = (
 "Sen kıdemli bir doğruluk denetimi (fact-checking) analistisin; medya hukuku editörü gibi düşünürsün "
@@ -18,7 +18,9 @@ SISTEM = (
 "(suç/örgüt üyeliği isnatları kaynağa atfedilen iddialardır, olgu gibi ileri sürme); nötr dil; uydurma yok.\n"
 "SINIFLANDIRMA: dogru | kismen_dogru | yanlis | dogrulanamaz | mesnetsiz | gorus. "
 "mesnetsiz=kaynak hiç delil göstermemiş; dayanak var ama teyit edemiyorsan dogrulanamaz; tereddütte dogrulanamaz. "
-"Aramayla net kanıt bulursan dogru/yanlis kullan ve dayanak_kaynak_url ver.\n"
+"TARAFSIZLIK: Tek bir tarafın (özellikle suçlanan kişinin) beyanına dayanarak bir iddiayı 'dogru' ya da "
+"'yanlis' İLAN ETME; inkâr da bir iddiadır. 'dogru/yanlis' için bağımsız belge, resmi/mahkeme kararı veya "
+"doğrulanabilir kanıt gerekir; yoksa dogrulanamaz. Aramayla net bağımsız kanıt bulursan dogru/yanlis kullan ve dayanak_kaynak_url ver.\n"
 "SADECE şu şemada geçerli JSON döndür (markdown/kod bloğu YOK): "
 '{"ozet":"3-5 cümle bağlamlı özet","genel_degerlendirme":"3-5 cümle tarafsız değerlendirme",'
 '"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle, arama bulgusuna dayalı","dayanak_kaynak_url":""}],'
@@ -26,15 +28,25 @@ SISTEM = (
 )
 
 def gemini_grounded(baslik, metin, key, model):
+    baslik = html.unescape(baslik or ""); metin = html.unescape(metin or "")
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
     body = json.dumps({
         "system_instruction": {"parts": [{"text": SISTEM}]},
         "contents": [{"role": "user", "parts": [{"text": f"BAŞLIK: {baslik}\n\nBAĞLAM: {metin}\n\nİddiaları web'de araştırıp şemaya göre değerlendir."}]}],
         "tools": [{"google_search": {}}],
-        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 2500},
+        "generationConfig": {"temperature": 0.2, "maxOutputTokens": 3500},
     }).encode()
     req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
-    data = json.loads(urllib.request.urlopen(req, timeout=120).read())
+    data = None
+    for attempt in range(4):
+        try:
+            data = json.loads(urllib.request.urlopen(req, timeout=120).read()); break
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 503) and attempt < 3:
+                time.sleep((20 if e.code == 429 else 5) * (attempt + 1)); continue
+            raise
+    if data is None:
+        raise RuntimeError("Gemini yanıt vermedi")
     cand = (data.get("candidates") or [{}])[0]
     parts = cand.get("content", {}).get("parts", [])
     text = "".join(p.get("text", "") for p in parts)
@@ -45,8 +57,13 @@ def gemini_grounded(baslik, metin, key, model):
         w = ch.get("web", {})
         if w.get("uri"): sources.append((w.get("title", ""), w["uri"]))
     queries = gm.get("webSearchQueries", [])
+    analiz = {"_ham": text}
     m = re.search(r"\{.*\}", text, re.DOTALL)
-    analiz = json.loads(m.group(0)) if m else {"_ham": text}
+    if m:
+        try:
+            analiz = json.loads(m.group(0))
+        except Exception:
+            analiz = {"_ham": text}
     return analiz, sources, queries
 
 def main():
