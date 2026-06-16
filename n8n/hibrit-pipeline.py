@@ -28,7 +28,8 @@ EVIDENCE_SYS = (
 "soruşturma / iddianame / yerel mahkeme kararı / kesinleşmiş mahkûmiyet / AİHM ihlal kararı) belirlemeye "
 "yardımcı kanıt bul. Yüksel Yalçınkaya/Türkiye (2023) kararının YANI SIRA, ondan SONRA çıkan AİHM ve AYM "
 "kararlarını da ara (FETÖ yargılamalarında lehe; ihlal, beraat, uzun tutukluluk, ByLock/Bank Asya delili "
-"vb.) — güncel içtihadı getir. Düz metin döndür: (1) haberin/iddiaların kısa özeti, (2) her iddia için bulunan "
+"vb.) — özellikle Yasak/Türkiye (5 Mayıs 2026) kararını ve ne dediğini araştır; güncel içtihadı getir. "
+"Düz metin döndür: (1) haberin/iddiaların kısa özeti, (2) her iddia için bulunan "
 "kanıt ve varsa mahkeme/AİHM/AYM kararı (karar adı + tarihi + ne dediği), (3) hukuki statü ipuçları. "
 "Tarafsız ol; karar adı/tarihini uydurma — yalnızca aramada bulduğunu yaz.")
 
@@ -45,7 +46,8 @@ CLAUDE_SYS = (
 "AİHS 7-6-11 ihlali); Akgün/Türkiye (2021: ham ByLock verisi sunulmadı; 5/1-5/4); Pişkin/Türkiye (2020: KHK "
 "ihraçlarında etkili başvuru yok; 6/1); Kavala/Türkiye (2019: uzun tutukluluk-kötü niyet; 18); "
 "Demirtaş/Türkiye No.2 (BD 2020: siyasetçi tutukluluğu; 5-18); Şahin Alpay & Mehmet Hasan Altan/Türkiye "
-"(2018: gazeteci tutukluluğu; 5/1-10); Salduz/Türkiye (2008: müdafi hakkı; 6); Aksoy/Türkiye (1996: işkence; 3). "
+"(2018: gazeteci tutukluluğu; 5/1-10); Salduz/Türkiye (2008: müdafi hakkı; 6); Aksoy/Türkiye (1996: işkence; 3); "
+"Yasak/Türkiye (5 Mayıs 2026: güncel lehe karar — içeriğini/kapsamını araştırma brifinden DOĞRULAYARAK kullan, UYDURMA). "
 "Bu kararları yalnızca konuyla ilgiliyse kullan; alakasız yere zorlama.\n"
 "- Olgu/yorum ayır; nötr dil; uydurma yok; tek tarafın beyanıyla 'doğru/yanlış' İLAN ETME.\n"
 "- Bir grubu/topluluğu TOPTAN suçlu/dışlayıcı gösteren ifadeler olgu değildir.\n"
