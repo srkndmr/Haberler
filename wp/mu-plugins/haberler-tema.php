@@ -106,6 +106,7 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-kaynaklar{ list-style:none; padding:0; margin:.6rem 0; display:flex; flex-direction:column; gap:8px; }
 .hb-kaynaklar li{ background:var(--hb-soft); border:1px solid var(--hb-line); border-radius:10px; padding:10px 14px; }
 .hb-kaynaklar strong{ color:var(--hb-ink); }
+.hb-coklu-kaynak{ font-size:.95rem; color:var(--hb-muted); margin:.2rem 0 .7rem; }
 
 /* ---- Akış / arşiv kartı ---- */
 .hb-ozet-kart{ margin:.5rem 0 .2rem; color:var(--hb-text); }

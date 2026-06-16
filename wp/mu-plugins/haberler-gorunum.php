@@ -153,7 +153,11 @@ function haberler_dosya_render($content) {
     }
 
     if (is_array($kay) && $kay) {
-        $h .= '<h2>' . haberler_ic('link') . 'Kaynaklar</h2><ul class="hb-kaynaklar">';
+        $h .= '<h2>' . haberler_ic('link') . 'Kaynaklar' . (count($kay) > 1 ? ' (' . count($kay) . ' mecra)' : '') . '</h2>';
+        if (count($kay) > 2) {
+            $h .= '<p class="hb-coklu-kaynak">Bu içerik <strong>' . count($kay) . ' ayrı mecrada</strong> yer aldı.</p>';
+        }
+        $h .= '<ul class="hb-kaynaklar">';
         foreach ($kay as $k) {
             $url = $k['orijinal_url'] ?? ''; $ad = $k['kaynak_adi'] ?? $url;
             $tar = !empty($k['yayin_tarihi']) ? ' — ' . esc_html($k['yayin_tarihi']) : '';
