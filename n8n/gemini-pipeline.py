@@ -40,7 +40,7 @@ def wp_create(title, analiz, kaynaklar):
                 for x in analiz.get("iddialar", [])]
     isim = "hayir" if analiz.get("isim_verilen_suclama") == "hayir" else "evet"
     payload = {"title": title[:120], "status": "draft",
-        "content": "Gemini (Google Search) ile üretilmiş TASLAK — editör/hukuk incelemesi bekliyor.",
+        "content": "",
         "meta": {"haberler_ozet": analiz.get("ozet",""),
                  "haberler_genel_degerlendirme": analiz.get("genel_degerlendirme",""),
                  "haberler_isim_verilen_suclama": isim,

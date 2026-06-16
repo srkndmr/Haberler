@@ -103,7 +103,7 @@ def wp_create(title, analiz, kaynaklar):
     ih = [h for h in (analiz.get("ihlal_edilen_haklar") or []) if h in haklar_ok]
     isim = "hayir" if analiz.get("isim_verilen_suclama") == "hayir" else "evet"
     payload = {"title": title[:120], "status": "draft",
-        "content": "Hibrit (Gemini kanıt + Claude analiz) TASLAK — editör/hukuk incelemesi bekliyor.",
+        "content": "",  # içerik analiz bölümlerinden (the_content filtresi) gelir; placeholder yok
         "meta": {"haberler_ozet": analiz.get("ozet",""), "haberler_genel_degerlendirme": analiz.get("genel_degerlendirme",""),
                  "haberler_baslik_en": analiz.get("baslik_en",""), "haberler_ozet_en": analiz.get("ozet_en",""),
                  "haberler_genel_degerlendirme_en": analiz.get("genel_degerlendirme_en",""),
