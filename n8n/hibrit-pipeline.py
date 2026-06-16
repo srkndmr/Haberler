@@ -85,33 +85,59 @@ def wp_create(title, analiz, kaynaklar):
         headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"})
     return json.loads(urllib.request.urlopen(req, timeout=30).read())
 
-def main():
-    if not (GKEY and CKEY and APP): print("HATA: GEMINI_API_KEY, ANTHROPIC_API_KEY, WP_APP_PASS gerekli."); sys.exit(1)
-    if len(sys.argv) > 1:
-        baslik = sys.argv[1]; metin = sys.argv[2] if len(sys.argv) > 2 else ""
-    else:
-        items = ayl.google_news_search(ayl.ANAHTAR_SORGU)
-        if not items: print("haber yok"); sys.exit(1)
-        baslik = items[0]["baslik"]; metin = items[0].get("ozet", "")
-
-    print(f"BAŞLIK: {baslik}\n1) Gemini kanıt topluyor (web + AİHM/AYM/Yargıtay)...")
+def process_one(baslik, metin):
+    """Tek haber: Gemini kanıt -> Claude analiz -> WP taslak. pid döndürür (boşsa None)."""
+    print(f"  BAŞLIK: {baslik[:75]}")
     brief, sources, queries = "", [], []
     for attempt in range(4):
         brief, sources, queries = gem.gemini_call(EVIDENCE_SYS,
             f"BAŞLIK: {baslik}\nBAĞLAM: {metin}\nKanıt ve ilgili mahkeme/AİHM kararlarını getir.", GKEY, GMODEL)
         if brief.strip(): break
-        print(f"   (boş, tekrar {attempt + 1}/4)"); time.sleep(5)
-    if not brief.strip(): print("✗ Gemini kanıt getirmedi; sonra tekrar denenebilir."); sys.exit(2)
-    print(f"   arama: {' | '.join(queries)}  | kaynak: {len(sources)}")
-
-    print("2) Claude analiz + rapor yazıyor...")
-    analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL)
+        time.sleep(5)
+    if not brief.strip():
+        print("    ✗ Gemini kanıt yok — atlandı"); return None
+    try:
+        analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL)
+    except Exception as e:
+        print(f"    ✗ Claude hata: {e}"); return None
+    if not analiz.get("ozet") and not analiz.get("iddialar"):
+        print("    ✗ Claude boş sonuç — atlandı"); return None
     kaynaklar = [{"kaynak_adi": t or "kaynak", "orijinal_url": resolve(u), "yayin_tarihi": ""} for t, u in sources[:8]]
-    print(f"   haber_sorunu: {analiz.get('haber_sorunu')} | iddia: {len(analiz.get('iddialar', []))}")
+    pid = wp_create(baslik, analiz, kaynaklar).get("id")
+    print(f"    ✓ taslak ID={pid} | sorun={analiz.get('haber_sorunu')} | iddia={len(analiz.get('iddialar', []))}")
+    return pid
 
-    res = wp_create(baslik, analiz, kaynaklar)
-    pid = res.get("id")
-    print(f"\n✓ WordPress taslağı: ID={pid}  →  {WP}/wp-admin/post.php?post={pid}&action=edit")
+def main():
+    if not (GKEY and CKEY and APP): print("HATA: GEMINI_API_KEY, ANTHROPIC_API_KEY, WP_APP_PASS gerekli."); sys.exit(1)
+
+    # Tek haber modu (argümanla)
+    if len(sys.argv) > 1:
+        process_one(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else "")
+        return
+
+    # GÜNLÜK TOPLU MOD: Google News -> dedup -> ilk N haberi işle (aralıklı)
+    limit = int(os.environ.get("LIMIT", "3"))
+    sleep_s = int(os.environ.get("SLEEP", "25"))
+    state = os.path.join(HERE, "scheduler", "seen-urls.txt")
+    seen = set()
+    if os.path.exists(state):
+        seen = {l.strip() for l in open(state, encoding="utf-8") if l.strip()}
+    items = ayl.google_news_search(ayl.ANAHTAR_SORGU)
+    yeni = [it for it in items if it.get("orijinal_url") and it["orijinal_url"] not in seen]
+    print(f"{len(items)} haber | {len(yeni)} yeni | hedef: {limit} taslak (haber arası {sleep_s}s)")
+    os.makedirs(os.path.dirname(state), exist_ok=True)
+    done = attempts = 0
+    for it in yeni:
+        if done >= limit or attempts >= limit * 2: break  # kotayı korumak için deneme tavanı
+        attempts += 1
+        pid = process_one(it["baslik"], it.get("ozet", ""))
+        with open(state, "a", encoding="utf-8") as fh:   # her denenen URL işaretlenir (tekrar denenmez)
+            fh.write(it["orijinal_url"] + "\n")
+        if pid:
+            done += 1
+        if done < limit and attempts < limit * 2:
+            time.sleep(sleep_s)
+    print(f"=== Bitti: {done} taslak üretildi (otomatik-taslak; insan/hukuk onayı bekler) ===")
 
 if __name__ == "__main__":
     main()
