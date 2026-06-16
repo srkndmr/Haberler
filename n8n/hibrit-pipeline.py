@@ -141,8 +141,8 @@ def main():
         return
 
     # GÜNLÜK TOPLU MOD: Google News -> dedup -> ilk N haberi işle (aralıklı)
-    limit = int(os.environ.get("LIMIT", "3"))
-    sleep_s = int(os.environ.get("SLEEP", "25"))
+    limit = int(os.environ.get("HIBRIT_LIMIT", "3"))     # .env'deki LIMIT (eski Claude) ile karışmasın
+    sleep_s = int(os.environ.get("HIBRIT_SLEEP", "25"))
     state = os.path.join(HERE, "scheduler", "seen-urls.txt")
     seen = set()
     if os.path.exists(state):
