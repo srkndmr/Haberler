@@ -67,6 +67,7 @@ function haberler_dosya_render($content) {
     $kay  = json_decode((string) get_post_meta($id, 'haberler_kaynaklar', true), true);
     $idd  = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
     $gd   = get_post_meta($id, 'haberler_genel_degerlendirme', true);
+    $sorun = json_decode((string) get_post_meta($id, 'haberler_haber_sorunu', true), true);
     if (!$ozet && !$kay && !$idd) return $content;
 
     // ---- Listeleme (akış/arşiv) ----
@@ -91,6 +92,19 @@ function haberler_dosya_render($content) {
 
     // ---- Tekil dosya ----
     $h  = '<div class="hb-dosya">';
+
+    // Tespit edilen haber sorunu (varsa) — en üstte belirgin banner
+    if (is_array($sorun)) {
+        $etiketler = [];
+        foreach ($sorun as $s) {
+            if ($s && $s !== 'sorun_yok' && isset(HABERLER_SORUN_ETIKET[$s])) $etiketler[] = HABERLER_SORUN_ETIKET[$s];
+        }
+        if ($etiketler) {
+            $h .= '<div class="hb-sorun"><span class="hb-sorun__ic">⚠</span> Bu haberde tespit edilen sorun: '
+                . '<strong>' . esc_html(implode(' · ', $etiketler)) . '</strong></div>';
+        }
+    }
+
     $h .= '<p class="hb-disclaimer hb-disclaimer--top"><strong>Not:</strong> Bu dosya, kamuya açık '
         . 'haberlerde öne sürülen iddiaların bağımsız bir değerlendirmesidir. Aktarılan iddialar ilgili '
         . 'kaynaklara aittir; bir kişinin suçlu olup olmadığına ilişkin nihai takdir yalnızca yargı '

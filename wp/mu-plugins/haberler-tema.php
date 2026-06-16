@@ -62,6 +62,10 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-disclaimer{ font-size:.92rem; border-radius:12px; padding:12px 16px; margin:12px 0 18px; }
 .hb-disclaimer--top{ background:#fff8e6; border:1px solid #f3d27a; color:#6b5200; }
 .hb-disclaimer--bottom{ background:var(--hb-soft); border:1px solid var(--hb-line); color:var(--hb-muted); font-size:.88rem; }
+.hb-sorun{ background:#fdecec; border:1px solid #f3b3b3; border-left:5px solid var(--c-yanlis); color:#7a1f23;
+  border-radius:12px; padding:13px 18px; margin:0 0 18px; font-size:1.02rem; }
+.hb-sorun strong{ color:#a01722; }
+.hb-sorun__ic{ font-weight:700; margin-right:.2em; }
 
 /* Değerlendirme kutusu (verdict) */
 .hb-verdict{ background:linear-gradient(180deg,#fbfdfd, #f2f7f7); border:1px solid #d8e6e6;

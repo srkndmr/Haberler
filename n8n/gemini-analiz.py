@@ -27,12 +27,12 @@ SISTEM = (
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}'
 )
 
-def gemini_grounded(baslik, metin, key, model):
-    baslik = html.unescape(baslik or ""); metin = html.unescape(metin or "")
+def gemini_call(system, user, key, model):
+    """Düşük seviye Gemini grounded çağrısı → (metin, kaynaklar, sorgular). Retry'li."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={key}"
     body = json.dumps({
-        "system_instruction": {"parts": [{"text": SISTEM}]},
-        "contents": [{"role": "user", "parts": [{"text": f"BAŞLIK: {baslik}\n\nBAĞLAM: {metin}\n\nİddiaları web'de araştırıp şemaya göre değerlendir."}]}],
+        "system_instruction": {"parts": [{"text": system}]},
+        "contents": [{"role": "user", "parts": [{"text": user}]}],
         "tools": [{"google_search": {}}],
         "generationConfig": {"temperature": 0.2, "maxOutputTokens": 3500},
     }).encode()
@@ -48,15 +48,15 @@ def gemini_grounded(baslik, metin, key, model):
     if data is None:
         raise RuntimeError("Gemini yanıt vermedi")
     cand = (data.get("candidates") or [{}])[0]
-    parts = cand.get("content", {}).get("parts", [])
-    text = "".join(p.get("text", "") for p in parts)
-    # grounding kaynakları
+    text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
     gm = cand.get("groundingMetadata", {})
-    sources = []
-    for ch in gm.get("groundingChunks", []):
-        w = ch.get("web", {})
-        if w.get("uri"): sources.append((w.get("title", ""), w["uri"]))
-    queries = gm.get("webSearchQueries", [])
+    sources = [(ch.get("web", {}).get("title", ""), ch["web"]["uri"])
+               for ch in gm.get("groundingChunks", []) if ch.get("web", {}).get("uri")]
+    return text, sources, gm.get("webSearchQueries", [])
+
+def gemini_grounded(baslik, metin, key, model):
+    user = f"BAŞLIK: {html.unescape(baslik or '')}\n\nBAĞLAM: {html.unescape(metin or '')}\n\nİddiaları web'de araştırıp şemaya göre değerlendir."
+    text, sources, queries = gemini_call(SISTEM, user, key, model)
     analiz = {"_ham": text}
     m = re.search(r"\{.*\}", text, re.DOTALL)
     if m:

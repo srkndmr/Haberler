@@ -9,10 +9,19 @@ if (!defined('ABSPATH')) exit;
 const HABERLER_META = [
     'haberler_ozet',
     'haberler_genel_degerlendirme',    // hukuki-gazetecilik dilinde genel değerlendirme
+    'haberler_haber_sorunu',           // JSON dizi: yalan_haber|iftira|toptan_suclama|carpitma|sorun_yok
     'haberler_isim_verilen_suclama',   // 'evet' | 'hayir'
     'haberler_isim_suclama_gerekce',
     'haberler_kaynaklar',              // JSON: [{kaynak_adi,orijinal_url,yayin_tarihi,arsiv_url,ekran_goruntusu}]
     'haberler_iddialar',               // JSON: [{iddia_metni,siniflandirma,gerekce,dayanak_kaynak_url}]
+];
+
+const HABERLER_SORUN_ETIKET = [
+    'yalan_haber'   => 'Yalan haber',
+    'iftira'        => 'İftira',
+    'toptan_suclama'=> 'Toptan suçlama',
+    'carpitma'      => 'Çarpıtma / bağlam saptırma',
+    'sorun_yok'     => 'Belirgin sorun yok',
 ];
 
 add_action('init', function () {
@@ -54,6 +63,10 @@ function haberler_dosya_box($post) {
 
     <p style="margin-top:14px"><strong>Genel Değerlendirme</strong> (hukuki-gazetecilik dili)</p>
     <textarea name="haberler_genel_degerlendirme" rows="5" style="width:100%"><?php echo esc_textarea($gd); ?></textarea>
+
+    <p style="margin-top:14px"><strong>Haber sorunu</strong> (JSON dizi) —
+       <code>["yalan_haber","iftira","toptan_suclama","carpitma"]</code> veya <code>["sorun_yok"]</code></p>
+    <textarea name="haberler_haber_sorunu" rows="2" style="width:100%;font-family:monospace"><?php echo esc_textarea(get_post_meta($post->ID, 'haberler_haber_sorunu', true)); ?></textarea>
 
     <p style="margin-top:14px"><strong>İsim verilen suçlama var mı?</strong>
        <span style="color:#a00">(evet ise hukuk kapısı tetiklenir)</span></p>
@@ -124,7 +137,7 @@ add_action('save_post_post', function ($post_id) {
     foreach (HABERLER_META as $key) {
         if (!isset($_POST[$key])) continue;
         // JSON alanlarını ham bırak (sadece slash temizle); diğerlerini metin temizle
-        if (in_array($key, ['haberler_kaynaklar', 'haberler_iddialar'], true)) {
+        if (in_array($key, ['haberler_kaynaklar', 'haberler_iddialar', 'haberler_haber_sorunu'], true)) {
             update_post_meta($post_id, $key, wp_unslash($_POST[$key]));
         } elseif (in_array($key, ['haberler_ozet', 'haberler_genel_degerlendirme'], true)) {
             update_post_meta($post_id, $key, sanitize_textarea_field(wp_unslash($_POST[$key])));
