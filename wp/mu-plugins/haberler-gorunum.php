@@ -68,6 +68,7 @@ function haberler_dosya_render($content) {
     $idd  = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
     $gd   = get_post_meta($id, 'haberler_genel_degerlendirme', true);
     $sorun = json_decode((string) get_post_meta($id, 'haberler_haber_sorunu', true), true);
+    $ihlal = json_decode((string) get_post_meta($id, 'haberler_ihlal_haklar', true), true);
     $ozet_en = get_post_meta($id, 'haberler_ozet_en', true);
     $gd_en = get_post_meta($id, 'haberler_genel_degerlendirme_en', true);
     $baslik_en = get_post_meta($id, 'haberler_baslik_en', true);
@@ -130,6 +131,18 @@ function haberler_dosya_render($content) {
 
     if ($ozet) $h .= '<h2>' . haberler_ic('doc') . 'Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
     if ($gd)   $h .= '<h2>' . haberler_ic('scale') . 'Genel Değerlendirme</h2><div class="hb-gd">' . nl2br(esc_html($gd)) . '</div>';
+
+    // İhlal edilen / risk altındaki temel haklar
+    if (is_array($ihlal) && $ihlal) {
+        $hli = '';
+        foreach ($ihlal as $hk) {
+            if (isset(HABERLER_HAK_ETIKET[$hk])) $hli .= '<li>' . esc_html(HABERLER_HAK_ETIKET[$hk]) . '</li>';
+        }
+        if ($hli) {
+            $h .= '<h2>' . haberler_ic('scale') . 'İhlal Edilen / Risk Altındaki Haklar</h2>';
+            $h .= '<ul class="hb-haklar">' . $hli . '</ul>';
+        }
+    }
 
     if (is_array($idd) && $idd) {
         $h .= '<h2>' . haberler_ic('check') . 'İddialar ve Değerlendirme</h2>';

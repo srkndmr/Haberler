@@ -50,6 +50,11 @@ CLAUDE_SYS = (
 "Yasak 2026 — adını/içeriğini UYDURMA; yalnızca brifte/aramada varsa kullan.)\n"
 "- Olgu/yorum ayır; nötr dil; uydurma yok; tek tarafın beyanıyla 'doğru/yanlış' İLAN ETME.\n"
 "- Bir grubu/topluluğu TOPTAN suçlu/dışlayıcı gösteren ifadeler olgu değildir.\n"
+"- İHLAL EDİLEN HAKLAR: Haberin veya aktardığı sürecin hangi temel hak ve özgürlükleri ihlal ettiğini/risk "
+"altına aldığını belirle ve ihlal_edilen_haklar dizisine ekle. Anahtarlar: ozel_hayat (özel hayatın gizliliği — "
+"isim/foto/aile/evlilik gibi mahrem detayların ifşası), din_vicdan (din ve vicdan özgürlüğü), orgutlenme "
+"(dernek/vakıf/örgütlenme özgürlüğü), masumiyet (masumiyet karinesi), adil_yargilanma, kanunsuz_ceza, ifade, "
+"ayrimcilik. Yalnızca gerçekten zedelenen hakları seç; genel_degerlendirme'de kısaca nasıl zedelendiğini belirt.\n"
 "- ÇOKLU KAYNAK: Haber birden çok mecrada yer aldıysa (sana MECRALAR listesi verilecek), "
 "genel_degerlendirme'de bunu belirt (kaç mecra ve başlıcaları) ve aynı iddianın çok sayıda mecrada "
 "eşzamanlı yayımının kayda değer bir olgu olduğunu not et; ancak bu tek başına suç/iftira kanıtı değildir.\n"
@@ -62,7 +67,8 @@ CLAUDE_SYS = (
 "SADECE şu şemada geçerli JSON döndür (markdown YOK):\n"
 '{"ozet":"3-5 cümle","genel_degerlendirme":"3-5 cümle, hukuki statü + AİHM/AYM dayanağı dahil",'
 '"baslik_en":"English title","ozet_en":"English summary","genel_degerlendirme_en":"English assessment",'
-'"haber_sorunu":["..."],"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: kriter + kanıt","dayanak_kaynak_url":"yalnızca tam http(s) URL; yoksa boş, kaynak adı YAZMA"}],'
+'"haber_sorunu":["..."],"ihlal_edilen_haklar":["ozel_hayat","din_vicdan","orgutlenme",...],'
+'"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: kriter + kanıt","dayanak_kaynak_url":"yalnızca tam http(s) URL; yoksa boş, kaynak adı YAZMA"}],'
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
 def resolve(u):
@@ -93,6 +99,8 @@ def wp_create(title, analiz, kaynaklar):
                  "gerekce": str(x.get("gerekce","")), "dayanak_kaynak_url": resolve(x.get("dayanak_kaynak_url","") or "")}
                 for x in analiz.get("iddialar", [])]
     hs = [s for s in (analiz.get("haber_sorunu") or []) if s in sorunlar] or ["sorun_yok"]
+    haklar_ok = {"ozel_hayat","din_vicdan","orgutlenme","masumiyet","adil_yargilanma","kanunsuz_ceza","ifade","ayrimcilik"}
+    ih = [h for h in (analiz.get("ihlal_edilen_haklar") or []) if h in haklar_ok]
     isim = "hayir" if analiz.get("isim_verilen_suclama") == "hayir" else "evet"
     payload = {"title": title[:120], "status": "draft",
         "content": "Hibrit (Gemini kanıt + Claude analiz) TASLAK — editör/hukuk incelemesi bekliyor.",
@@ -100,6 +108,7 @@ def wp_create(title, analiz, kaynaklar):
                  "haberler_baslik_en": analiz.get("baslik_en",""), "haberler_ozet_en": analiz.get("ozet_en",""),
                  "haberler_genel_degerlendirme_en": analiz.get("genel_degerlendirme_en",""),
                  "haberler_haber_sorunu": json.dumps(hs, ensure_ascii=False),
+                 "haberler_ihlal_haklar": json.dumps(ih, ensure_ascii=False),
                  "haberler_isim_verilen_suclama": isim, "haberler_isim_suclama_gerekce": analiz.get("isim_verilen_suclama_gerekce",""),
                  "haberler_kaynaklar": json.dumps(kaynaklar, ensure_ascii=False), "haberler_iddialar": json.dumps(iddialar, ensure_ascii=False)}}
     auth = base64.b64encode(f"{USER}:{APP}".encode()).decode()

@@ -107,6 +107,9 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-kaynaklar li{ background:var(--hb-soft); border:1px solid var(--hb-line); border-radius:10px; padding:10px 14px; }
 .hb-kaynaklar strong{ color:var(--hb-ink); }
 .hb-coklu-kaynak{ font-size:.95rem; color:var(--hb-muted); margin:.2rem 0 .7rem; }
+.hb-haklar{ list-style:none; padding:0; margin:.6rem 0; display:flex; flex-direction:column; gap:8px; }
+.hb-haklar li{ background:#fff5f5; border:1px solid #f3c0c0; border-left:4px solid var(--c-yanlis);
+  border-radius:8px; padding:9px 14px; font-weight:500; color:#7a1f23; }
 .hb-en{ margin-top:1.8rem; border:1px solid var(--hb-line); border-radius:12px; padding:4px 18px; background:var(--hb-soft); }
 .hb-en summary{ cursor:pointer; font-weight:600; color:var(--hb-accent); padding:10px 0; list-style:none; }
 .hb-en summary::-webkit-details-marker{ display:none; }

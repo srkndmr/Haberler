@@ -13,6 +13,7 @@ const HABERLER_META = [
     'haberler_ozet_en',                // İngilizce özet
     'haberler_genel_degerlendirme_en', // İngilizce genel değerlendirme
     'haberler_haber_sorunu',           // JSON dizi: yalan_haber|iftira|toptan_suclama|carpitma|sorun_yok
+    'haberler_ihlal_haklar',           // JSON dizi: ihlal edilen/risk altındaki temel haklar
     'haberler_isim_verilen_suclama',   // 'evet' | 'hayir'
     'haberler_isim_suclama_gerekce',
     'haberler_kaynaklar',              // JSON: [{kaynak_adi,orijinal_url,yayin_tarihi,arsiv_url,ekran_goruntusu}]
@@ -25,6 +26,18 @@ const HABERLER_SORUN_ETIKET = [
     'toptan_suclama'=> 'Toptan suçlama',
     'carpitma'      => 'Çarpıtma / bağlam saptırma',
     'sorun_yok'     => 'Belirgin sorun yok',
+];
+
+// Haberde ihlal edilen / risk altındaki temel hak ve özgürlükler (AİHS maddeleriyle)
+const HABERLER_HAK_ETIKET = [
+    'ozel_hayat'      => 'Özel hayatın gizliliği (AİHS m.8)',
+    'din_vicdan'      => 'Din ve vicdan özgürlüğü (AİHS m.9)',
+    'orgutlenme'      => 'Dernek/vakıf ve örgütlenme özgürlüğü (AİHS m.11)',
+    'masumiyet'       => 'Masumiyet karinesi (AİHS m.6/2)',
+    'adil_yargilanma' => 'Adil yargılanma hakkı (AİHS m.6)',
+    'kanunsuz_ceza'   => 'Kanunsuz ceza olmaz (AİHS m.7)',
+    'ifade'           => 'İfade özgürlüğü (AİHS m.10)',
+    'ayrimcilik'      => 'Ayrımcılık yasağı (AİHS m.14)',
 ];
 
 add_action('init', function () {
@@ -70,6 +83,10 @@ function haberler_dosya_box($post) {
     <p style="margin-top:14px"><strong>Haber sorunu</strong> (JSON dizi) —
        <code>["yalan_haber","iftira","toptan_suclama","carpitma"]</code> veya <code>["sorun_yok"]</code></p>
     <textarea name="haberler_haber_sorunu" rows="2" style="width:100%;font-family:monospace"><?php echo esc_textarea(get_post_meta($post->ID, 'haberler_haber_sorunu', true)); ?></textarea>
+
+    <p style="margin-top:14px"><strong>İhlal edilen / risk altındaki haklar</strong> (JSON dizi) —
+       <code>["ozel_hayat","din_vicdan","orgutlenme","masumiyet","adil_yargilanma","kanunsuz_ceza","ifade","ayrimcilik"]</code></p>
+    <textarea name="haberler_ihlal_haklar" rows="2" style="width:100%;font-family:monospace"><?php echo esc_textarea(get_post_meta($post->ID, 'haberler_ihlal_haklar', true)); ?></textarea>
 
     <p style="margin-top:14px"><strong>İsim verilen suçlama var mı?</strong>
        <span style="color:#a00">(evet ise hukuk kapısı tetiklenir)</span></p>
@@ -140,7 +157,7 @@ add_action('save_post_post', function ($post_id) {
     foreach (HABERLER_META as $key) {
         if (!isset($_POST[$key])) continue;
         // JSON alanlarını ham bırak (sadece slash temizle); diğerlerini metin temizle
-        if (in_array($key, ['haberler_kaynaklar', 'haberler_iddialar', 'haberler_haber_sorunu'], true)) {
+        if (in_array($key, ['haberler_kaynaklar', 'haberler_iddialar', 'haberler_haber_sorunu', 'haberler_ihlal_haklar'], true)) {
             update_post_meta($post_id, $key, wp_unslash($_POST[$key]));
         } elseif (in_array($key, ['haberler_ozet', 'haberler_genel_degerlendirme', 'haberler_ozet_en', 'haberler_genel_degerlendirme_en'], true)) {
             update_post_meta($post_id, $key, sanitize_textarea_field(wp_unslash($_POST[$key])));
