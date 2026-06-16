@@ -9,6 +9,9 @@ if (!defined('ABSPATH')) exit;
 const HABERLER_META = [
     'haberler_ozet',
     'haberler_genel_degerlendirme',    // hukuki-gazetecilik dilinde genel değerlendirme
+    'haberler_baslik_en',              // İngilizce başlık
+    'haberler_ozet_en',                // İngilizce özet
+    'haberler_genel_degerlendirme_en', // İngilizce genel değerlendirme
     'haberler_haber_sorunu',           // JSON dizi: yalan_haber|iftira|toptan_suclama|carpitma|sorun_yok
     'haberler_isim_verilen_suclama',   // 'evet' | 'hayir'
     'haberler_isim_suclama_gerekce',
@@ -139,7 +142,7 @@ add_action('save_post_post', function ($post_id) {
         // JSON alanlarını ham bırak (sadece slash temizle); diğerlerini metin temizle
         if (in_array($key, ['haberler_kaynaklar', 'haberler_iddialar', 'haberler_haber_sorunu'], true)) {
             update_post_meta($post_id, $key, wp_unslash($_POST[$key]));
-        } elseif (in_array($key, ['haberler_ozet', 'haberler_genel_degerlendirme'], true)) {
+        } elseif (in_array($key, ['haberler_ozet', 'haberler_genel_degerlendirme', 'haberler_ozet_en', 'haberler_genel_degerlendirme_en'], true)) {
             update_post_meta($post_id, $key, sanitize_textarea_field(wp_unslash($_POST[$key])));
         } else {
             update_post_meta($post_id, $key, sanitize_text_field(wp_unslash($_POST[$key])));

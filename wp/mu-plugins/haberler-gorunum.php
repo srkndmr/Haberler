@@ -68,6 +68,9 @@ function haberler_dosya_render($content) {
     $idd  = json_decode((string) get_post_meta($id, 'haberler_iddialar', true), true);
     $gd   = get_post_meta($id, 'haberler_genel_degerlendirme', true);
     $sorun = json_decode((string) get_post_meta($id, 'haberler_haber_sorunu', true), true);
+    $ozet_en = get_post_meta($id, 'haberler_ozet_en', true);
+    $gd_en = get_post_meta($id, 'haberler_genel_degerlendirme_en', true);
+    $baslik_en = get_post_meta($id, 'haberler_baslik_en', true);
     if (!$ozet && !$kay && !$idd) return $content;
 
     // ---- Listeleme (akış/arşiv) ----
@@ -167,6 +170,16 @@ function haberler_dosya_render($content) {
             $h .= '</li>';
         }
         $h .= '</ul>';
+    }
+
+    if ($ozet_en || $gd_en) {
+        $h .= '<details class="hb-en"><summary>🌐 In English</summary>';
+        if ($baslik_en) $h .= '<h3>' . esc_html($baslik_en) . '</h3>';
+        if ($ozet_en) $h .= '<p>' . nl2br(esc_html($ozet_en)) . '</p>';
+        if ($gd_en)   $h .= '<p>' . nl2br(esc_html($gd_en)) . '</p>';
+        $h .= '<p class="hb-en__note">Automated fact-check draft, reviewed by a human editor. '
+            . 'Claims are attributed to their sources; this is not a final legal determination.</p>';
+        $h .= '</details>';
     }
 
     $h .= '<p class="hb-disclaimer hb-disclaimer--bottom">Bu çalışma bağımsız bir medya izleme ve '

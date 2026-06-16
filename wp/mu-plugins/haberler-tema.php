@@ -107,6 +107,14 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-kaynaklar li{ background:var(--hb-soft); border:1px solid var(--hb-line); border-radius:10px; padding:10px 14px; }
 .hb-kaynaklar strong{ color:var(--hb-ink); }
 .hb-coklu-kaynak{ font-size:.95rem; color:var(--hb-muted); margin:.2rem 0 .7rem; }
+.hb-en{ margin-top:1.8rem; border:1px solid var(--hb-line); border-radius:12px; padding:4px 18px; background:var(--hb-soft); }
+.hb-en summary{ cursor:pointer; font-weight:600; color:var(--hb-accent); padding:10px 0; list-style:none; }
+.hb-en summary::-webkit-details-marker{ display:none; }
+.hb-en summary::before{ content:"▸ "; }
+.hb-en[open] summary::before{ content:"▾ "; }
+.hb-en h3{ font-family:var(--serif); color:var(--hb-ink); margin:.5rem 0; }
+.hb-en p{ margin:.6rem 0; }
+.hb-en__note{ font-size:.84rem; color:var(--hb-muted); }
 
 /* ---- Akış / arşiv kartı ---- */
 .hb-ozet-kart{ margin:.5rem 0 .2rem; color:var(--hb-text); }

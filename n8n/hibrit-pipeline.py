@@ -26,8 +26,11 @@ EVIDENCE_SYS = (
 "SINIFLANDIRMA veya HÜKÜM VERME; yalnızca bulgu ve kaynak getir. Özellikle ilgili AİHM kararlarını "
 "(örn. Yalçınkaya/Türkiye), AYM ve Yargıtay içtihadını ara; bir isnadın HUKUKİ STATÜSÜNÜ (iddia / "
 "soruşturma / iddianame / yerel mahkeme kararı / kesinleşmiş mahkûmiyet / AİHM ihlal kararı) belirlemeye "
-"yardımcı kanıt bul. Düz metin döndür: (1) haberin/iddiaların kısa özeti, (2) her iddia için bulunan kanıt "
-"ve varsa mahkeme/AİHM kararı (karar adı + ne dediği), (3) hukuki statü ipuçları. Tarafsız ol; uydurma yok.")
+"yardımcı kanıt bul. Yüksel Yalçınkaya/Türkiye (2023) kararının YANI SIRA, ondan SONRA çıkan AİHM ve AYM "
+"kararlarını da ara (FETÖ yargılamalarında lehe; ihlal, beraat, uzun tutukluluk, ByLock/Bank Asya delili "
+"vb.) — güncel içtihadı getir. Düz metin döndür: (1) haberin/iddiaların kısa özeti, (2) her iddia için bulunan "
+"kanıt ve varsa mahkeme/AİHM/AYM kararı (karar adı + tarihi + ne dediği), (3) hukuki statü ipuçları. "
+"Tarafsız ol; karar adı/tarihini uydurma — yalnızca aramada bulduğunu yaz.")
 
 CLAUDE_SYS = (
 "Sen kıdemli bir doğruluk denetimi analisti ve insan hakları/medya hukuku editörüsün. Sana bir haber başlığı "
@@ -46,8 +49,11 @@ CLAUDE_SYS = (
 "eşzamanlı yayımının kayda değer bir olgu olduğunu not et; ancak bu tek başına suç/iftira kanıtı değildir.\n"
 "SINIFLANDIRMA: dogru|kismen_dogru|yanlis|dogrulanamaz|mesnetsiz|gorus.\n"
 "HABER SORUNU (haber_sorunu dizisi): yalan_haber|iftira|toptan_suclama|carpitma — hiçbiri yoksa [\"sorun_yok\"].\n"
+"İNGİLİZCE: Uluslararası (AİHM) okuyucu için ayrıca İngilizce çeviri alanları doldur: baslik_en "
+"(başlığın İngilizcesi), ozet_en, genel_degerlendirme_en (aynı içeriğin akıcı İngilizcesi).\n"
 "SADECE şu şemada geçerli JSON döndür (markdown YOK):\n"
 '{"ozet":"3-5 cümle","genel_degerlendirme":"3-5 cümle, hukuki statü + AİHM/AYM dayanağı dahil",'
+'"baslik_en":"English title","ozet_en":"English summary","genel_degerlendirme_en":"English assessment",'
 '"haber_sorunu":["..."],"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: hukuki statü + kanıt","dayanak_kaynak_url":""}],'
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
@@ -83,6 +89,8 @@ def wp_create(title, analiz, kaynaklar):
     payload = {"title": title[:120], "status": "draft",
         "content": "Hibrit (Gemini kanıt + Claude analiz) TASLAK — editör/hukuk incelemesi bekliyor.",
         "meta": {"haberler_ozet": analiz.get("ozet",""), "haberler_genel_degerlendirme": analiz.get("genel_degerlendirme",""),
+                 "haberler_baslik_en": analiz.get("baslik_en",""), "haberler_ozet_en": analiz.get("ozet_en",""),
+                 "haberler_genel_degerlendirme_en": analiz.get("genel_degerlendirme_en",""),
                  "haberler_haber_sorunu": json.dumps(hs, ensure_ascii=False),
                  "haberler_isim_verilen_suclama": isim, "haberler_isim_suclama_gerekce": analiz.get("isim_verilen_suclama_gerekce",""),
                  "haberler_kaynaklar": json.dumps(kaynaklar, ensure_ascii=False), "haberler_iddialar": json.dumps(iddialar, ensure_ascii=False)}}
@@ -114,12 +122,15 @@ def process_one(baslik, metin, kaynaklar=None):
     mecralar = sorted({k["kaynak_adi"] for k in (kaynaklar or []) if k.get("kaynak_adi")})
     brief, sources, queries = "", [], []
     for attempt in range(4):
-        brief, sources, queries = gem.gemini_call(EVIDENCE_SYS,
-            f"BAŞLIK: {baslik}\nBAĞLAM: {metin}\nKanıt ve ilgili mahkeme/AİHM kararlarını getir.", GKEY, GMODEL)
+        try:
+            brief, sources, queries = gem.gemini_call(EVIDENCE_SYS,
+                f"BAŞLIK: {baslik}\nBAĞLAM: {metin}\nKanıt ve ilgili mahkeme/AİHM kararlarını getir.", GKEY, GMODEL)
+        except Exception as e:
+            print(f"    Gemini hata (kota/ağ?): {e}"); brief = ""
         if brief.strip(): break
         time.sleep(5)
     if not brief.strip():
-        print("    ✗ Gemini kanıt yok — atlandı"); return None
+        print("    ✗ Gemini kanıt yok (atlandı)"); return None
     try:
         analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL, mecralar)
     except Exception as e:
@@ -141,7 +152,7 @@ def main():
         return
 
     # GÜNLÜK TOPLU MOD: Google News -> dedup -> ilk N haberi işle (aralıklı)
-    limit = int(os.environ.get("HIBRIT_LIMIT", "3"))     # .env'deki LIMIT (eski Claude) ile karışmasın
+    limit = int(os.environ.get("HIBRIT_LIMIT", "8"))     # kümeleme sonrası zaten ~4-5 farklı haber kalır
     sleep_s = int(os.environ.get("HIBRIT_SLEEP", "25"))
     state = os.path.join(HERE, "scheduler", "seen-urls.txt")
     seen = set()

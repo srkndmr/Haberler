@@ -12,7 +12,8 @@ Kullanım:
 """
 import os, re, sys, json, base64, urllib.parse, urllib.request, xml.etree.ElementTree as ET
 
-ANAHTAR_SORGU = '(fetö OR fethullahçı OR fetullahçı OR gülen OR bylock OR "fetö/pdy" OR "15 temmuz")'
+# Kapsam: yalnızca "FETÖ" / "Fethullahçı Terör Örgütü" ifadeleri geçen haberler
+ANAHTAR_SORGU = '("FETÖ" OR "Fethullahçı Terör Örgütü" OR fethullahçı)'
 UA = {"User-Agent": "Mozilla/5.0 (HaberlerPipeline/1.0)"}
 
 def fetch(url):

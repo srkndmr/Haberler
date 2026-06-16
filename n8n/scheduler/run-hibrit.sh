@@ -14,8 +14,8 @@ set +a
 LOG="$DIR/hibrit.log"
 echo "===== $(date '+%Y-%m-%d %H:%M:%S') hibrit başladı =====" >> "$LOG"
 
-# Günde en çok 3 yeni dosya, küme arası 25s (kota/RPM dostu)
-HIBRIT_LIMIT="${HIBRIT_LIMIT:-3}" HIBRIT_SLEEP="${HIBRIT_SLEEP:-25}" \
+# Kümeleme sonrası zaten ~4-5 farklı haber; tavan 8, küme arası 25s (kota/RPM dostu)
+HIBRIT_LIMIT="${HIBRIT_LIMIT:-8}" HIBRIT_SLEEP="${HIBRIT_SLEEP:-25}" \
   python3 "$DIR/../hibrit-pipeline.py" >> "$LOG" 2>&1
 
 echo "===== $(date '+%Y-%m-%d %H:%M:%S') bitti =====" >> "$LOG"
