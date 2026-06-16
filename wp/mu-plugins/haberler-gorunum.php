@@ -147,10 +147,15 @@ function haberler_dosya_render($content) {
             $h .= '<p class="hb-iddia__metin">' . esc_html($x['iddia_metni'] ?? '') . '</p>';
             if (!empty($x['gerekce']))
                 $h .= '<p class="hb-iddia__satir"><b>Gerekçe:</b> ' . esc_html($x['gerekce']) . '</p>';
-            if (!empty($x['dayanak_kaynak_url']))
-                $h .= '<p class="hb-iddia__satir hb-iddia__dayanak"><b>Dayanak:</b> <a href="'
-                    . esc_url($x['dayanak_kaynak_url']) . '" target="_blank" rel="noopener">'
-                    . esc_html($x['dayanak_kaynak_url']) . '</a></p>';
+            if (!empty($x['dayanak_kaynak_url'])) {
+                $du = $x['dayanak_kaynak_url'];
+                if (preg_match('#^https?://#i', $du)) {  // sadece gerçek URL link olur
+                    $h .= '<p class="hb-iddia__satir hb-iddia__dayanak"><b>Dayanak:</b> <a href="'
+                        . esc_url($du) . '" target="_blank" rel="noopener">' . esc_html($du) . '</a></p>';
+                } else {  // kaynak adı vb. ise düz metin (bozuk link olmasın)
+                    $h .= '<p class="hb-iddia__satir hb-iddia__dayanak"><b>Dayanak:</b> ' . esc_html($du) . '</p>';
+                }
+            }
             $h .= '</div>';
         }
     }

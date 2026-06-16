@@ -41,27 +41,27 @@ CLAUDE_SYS = (
 "- Masumiyet karinesi: Bir isnadın 'suç' sayılması KESİNLEŞMİŞ mahkûmiyet gerektirir. Kesinleşme yoksa "
 "(iddia/soruşturma/iddianame/yerel karar) kişi 'suçlu/terörist' DEĞİLDİR; medya bunu kesin suçmuş gibi sunuyorsa "
 "bu bir ÇARPITMA'dır, gerekçede belirt.\n"
-"- AİHM/AYM kararları üstün kanıttır: Brifte böyle bir karar varsa dayanak göster. DOĞRULANMIŞ REFERANS "
-"İÇTİHAT (uygunsa adıyla kullan): Yalçınkaya/Türkiye (BD, 2023: yalnızca ByLock üyelik suçu için yetersiz; "
-"AİHS 7-6-11 ihlali); Akgün/Türkiye (2021: ham ByLock verisi sunulmadı; 5/1-5/4); Pişkin/Türkiye (2020: KHK "
-"ihraçlarında etkili başvuru yok; 6/1); Kavala/Türkiye (2019: uzun tutukluluk-kötü niyet; 18); "
-"Demirtaş/Türkiye No.2 (BD 2020: siyasetçi tutukluluğu; 5-18); Şahin Alpay & Mehmet Hasan Altan/Türkiye "
-"(2018: gazeteci tutukluluğu; 5/1-10); Salduz/Türkiye (2008: müdafi hakkı; 6); Aksoy/Türkiye (1996: işkence; 3); "
-"Yasak/Türkiye (5 Mayıs 2026: güncel lehe karar — içeriğini/kapsamını araştırma brifinden DOĞRULAYARAK kullan, UYDURMA). "
-"Bu kararları yalnızca konuyla ilgiliyse kullan; alakasız yere zorlama.\n"
+"- HUKUKİ KRİTERLER (esas budur, her dosyada uygula): Tek bir delille (ör. ByLock/Bank Asya/dernek üyeliği) "
+"mahkûmiyet kurulamaz; delil hukuka uygun ve yeterli olmalı, suç kastı açıkça ortaya konmalı; kesinleşmiş "
+"mahkûmiyet olmadan kişi suçlu sayılamaz. Bu KRİTERLERİ dile getir; ancak AİHM/AYM KARAR ADLARINI her cümlede "
+"TEKRARLAMA — yalnızca doğrudan emsalse BİR KEZ, kısaca an. (Gerekirse, doğrulanmış kararlar: Yalçınkaya 2023, "
+"Akgün 2021, Pişkin 2020, Kavala 2019, Demirtaş No.2 2020, Şahin Alpay/Altan 2018, Salduz 2008, Aksoy 1996, "
+"Yasak 2026 — adını/içeriğini UYDURMA; yalnızca brifte/aramada varsa kullan.)\n"
 "- Olgu/yorum ayır; nötr dil; uydurma yok; tek tarafın beyanıyla 'doğru/yanlış' İLAN ETME.\n"
 "- Bir grubu/topluluğu TOPTAN suçlu/dışlayıcı gösteren ifadeler olgu değildir.\n"
 "- ÇOKLU KAYNAK: Haber birden çok mecrada yer aldıysa (sana MECRALAR listesi verilecek), "
 "genel_degerlendirme'de bunu belirt (kaç mecra ve başlıcaları) ve aynı iddianın çok sayıda mecrada "
 "eşzamanlı yayımının kayda değer bir olgu olduğunu not et; ancak bu tek başına suç/iftira kanıtı değildir.\n"
-"SINIFLANDIRMA: dogru|kismen_dogru|yanlis|dogrulanamaz|mesnetsiz|gorus.\n"
+"SINIFLANDIRMA: dogru|yanlis|dogrulanamaz|mesnetsiz|gorus. 'dogru' SADECE iddia sağlam ve doğrulanabilir "
+"kanıtla TAM ve şüphesiz doğrulanıyorsa verilir. Bir kısmı doğru bir kısmı kanıtsız/çarpıtılmışsa 'dogru' DEME → "
+"dogrulanamaz veya yanlis kullan ve haber_sorunu'na carpitma ekle. 'kısmen doğru' (kismen_dogru) KULLANMA.\n"
 "HABER SORUNU (haber_sorunu dizisi): yalan_haber|iftira|toptan_suclama|carpitma — hiçbiri yoksa [\"sorun_yok\"].\n"
 "İNGİLİZCE: Uluslararası (AİHM) okuyucu için ayrıca İngilizce çeviri alanları doldur: baslik_en "
 "(başlığın İngilizcesi), ozet_en, genel_degerlendirme_en (aynı içeriğin akıcı İngilizcesi).\n"
 "SADECE şu şemada geçerli JSON döndür (markdown YOK):\n"
 '{"ozet":"3-5 cümle","genel_degerlendirme":"3-5 cümle, hukuki statü + AİHM/AYM dayanağı dahil",'
 '"baslik_en":"English title","ozet_en":"English summary","genel_degerlendirme_en":"English assessment",'
-'"haber_sorunu":["..."],"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: hukuki statü + kanıt","dayanak_kaynak_url":""}],'
+'"haber_sorunu":["..."],"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: kriter + kanıt","dayanak_kaynak_url":"yalnızca tam http(s) URL; yoksa boş, kaynak adı YAZMA"}],'
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
 def resolve(u):
@@ -85,7 +85,7 @@ def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
     return json.loads(m.group(0))
 
 def wp_create(title, analiz, kaynaklar):
-    valid = {"dogru","kismen_dogru","yanlis","dogrulanamaz","mesnetsiz","gorus"}
+    valid = {"dogru","yanlis","dogrulanamaz","mesnetsiz","gorus"}  # kismen_dogru kullanılmıyor
     sorunlar = {"yalan_haber","iftira","toptan_suclama","carpitma","sorun_yok"}
     iddialar = [{"iddia_metni": str(x.get("iddia_metni",""))[:2000],
                  "siniflandirma": x.get("siniflandirma") if x.get("siniflandirma") in valid else "dogrulanamaz",
