@@ -155,8 +155,8 @@ def process_one(baslik, metin, kaynaklar=None):
         analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL, mecralar)
     except Exception as e:
         print(f"    ✗ Claude hata: {e}"); return None
-    if not analiz.get("ozet") and not analiz.get("iddialar"):
-        print("    ✗ Claude boş sonuç — atlandı"); return None
+    if not analiz.get("iddialar"):
+        print("    ✗ Somut iddia yok — fact-check konusu değil, atlandı"); return None
     if not kaynaklar:  # clustering yoksa Gemini'nin bulduğu kaynaklar
         kaynaklar = [{"kaynak_adi": t or "kaynak", "orijinal_url": resolve(u), "yayin_tarihi": ""} for t, u in sources[:8]]
     pid = wp_create(baslik, analiz, kaynaklar).get("id")
@@ -179,6 +179,9 @@ def main():
     if os.path.exists(state):
         seen = {l.strip() for l in open(state, encoding="utf-8") if l.strip()}
     items = ayl.google_news_search(ayl.ANAHTAR_SORGU)
+    # İlgililik süzgeci: başlık/özette FETÖ-çekirdek terim olmalı ("15 Temmuz" tek başına otobüs hattı/okul yakalıyor)
+    cekirdek = ("fetö", "feto", "fethullah", "gülen", "gulen", "bylock")
+    items = [it for it in items if any(k in ((it.get("baslik", "") + " " + it.get("ozet", "")).lower()) for k in cekirdek)]
     yeni = [it for it in items if it.get("orijinal_url") and it["orijinal_url"] not in seen]
     # Aynı haberi farklı mecralarda topla; çok mecralı kümeler önce (daha yüksek haber değeri)
     kumeler = cluster_items(yeni)
