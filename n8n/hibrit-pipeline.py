@@ -161,6 +161,10 @@ def process_one(baslik, metin, kaynaklar=None):
         print(f"    ✗ Claude hata: {e}"); return None
     if not analiz.get("iddialar"):
         print("    ✗ Somut iddia yok — fact-check konusu değil, atlandı"); return None
+    # Yalnızca SIKINTILI haberleri kaydet (yalan/iftira/toptan/çarpıtma). Nötr haber atlanır.
+    hs_real = [s for s in (analiz.get("haber_sorunu") or []) if s in {"yalan_haber", "iftira", "toptan_suclama", "carpitma"}]
+    if os.environ.get("HIBRIT_ONLY_PROBLEM", "1") != "0" and not hs_real:
+        print("    ↷ Belirgin sorun yok (nötr haber) — kaydedilmedi"); return None
     if not kaynaklar:  # clustering yoksa Gemini'nin bulduğu kaynaklar
         kaynaklar = [{"kaynak_adi": t or "kaynak", "orijinal_url": resolve(u), "yayin_tarihi": ""} for t, u in sources[:8]]
     pid = wp_create(baslik, analiz, kaynaklar).get("id")
