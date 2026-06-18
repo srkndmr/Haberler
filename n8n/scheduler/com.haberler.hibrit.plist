@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
-  macOS launchd: HİBRİT pipeline'ı her gün 08:00'de çalıştırır.
+  macOS launchd: HİBRİT pipeline'ı her gün 09:25'te çalıştırır.
   Kurulum:
     cp com.haberler.hibrit.plist ~/Library/LaunchAgents/
     launchctl load ~/Library/LaunchAgents/com.haberler.hibrit.plist
@@ -21,8 +21,8 @@
 
     <key>StartCalendarInterval</key>
     <dict>
-        <key>Hour</key><integer>8</integer>
-        <key>Minute</key><integer>0</integer>
+        <key>Hour</key><integer>9</integer>
+        <key>Minute</key><integer>25</integer>
     </dict>
 
     <key>StandardOutPath</key>
