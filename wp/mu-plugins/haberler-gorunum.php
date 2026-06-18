@@ -69,6 +69,11 @@ function haberler_dosya_render($content) {
     $gd   = get_post_meta($id, 'haberler_genel_degerlendirme', true);
     $sorun = json_decode((string) get_post_meta($id, 'haberler_haber_sorunu', true), true);
     $ihlal = json_decode((string) get_post_meta($id, 'haberler_ihlal_haklar', true), true);
+    $kanunlar = json_decode((string) get_post_meta($id, 'haberler_kanun_maddeleri', true), true);
+    $kategori = get_post_meta($id, 'haberler_medya_kategori', true);
+    $kat_ger  = get_post_meta($id, 'haberler_kategori_gerekce', true);
+    $halk     = get_post_meta($id, 'haberler_halk_tabiri', true);
+    $aracnot  = get_post_meta($id, 'haberler_araclastirma', true);
     $ozet_en = get_post_meta($id, 'haberler_ozet_en', true);
     $gd_en = get_post_meta($id, 'haberler_genel_degerlendirme_en', true);
     $baslik_en = get_post_meta($id, 'haberler_baslik_en', true);
@@ -87,6 +92,11 @@ function haberler_dosya_render($content) {
         $ksay  = is_array($kay) ? count($kay) : 0;
         $ozetk = $ozet ? mb_substr($ozet, 0, 220) . (mb_strlen($ozet) > 220 ? '…' : '') : '';
         $o = '<div class="hb-ozet-kart">';
+        if ($kategori && isset(HABERLER_KATEGORI[$kategori])) {
+            $kv = HABERLER_KATEGORI[$kategori];
+            $o .= '<p><span class="hb-kat-rozet hb-kat-rozet--sev' . (int) ($kv['sev'] ?? 1) . '">'
+                . esc_html($kv['tr']) . '</span></p>';
+        }
         if ($ozetk) $o .= '<p>' . esc_html($ozetk) . '</p>';
         if ($chips) $o .= '<p>' . $chips . '</p>';
         if ($ksay)  $o .= '<p class="hb-kaynak-sayi">' . esc_html($ksay) . ' kaynak</p>';
@@ -96,6 +106,46 @@ function haberler_dosya_render($content) {
 
     // ---- Tekil dosya ----
     $h  = '<div class="hb-dosya">';
+
+    // EN ÜST: Uluslararası habercilik değerlendirmesi — medya kategorisi (ağırlık kademeli)
+    if ($kategori && isset(HABERLER_KATEGORI[$kategori])) {
+        $kv  = HABERLER_KATEGORI[$kategori];
+        $sev = (int) ($kv['sev'] ?? 1);
+        $h .= '<div class="hb-kategori hb-kategori--sev' . $sev . '">'
+            . '<div class="hb-kategori__ust">Uluslararası habercilik değerlendirmesi</div>'
+            . '<div class="hb-kategori__ad">' . esc_html($kv['tr']) . '</div>'
+            . '<div class="hb-kategori__en">' . esc_html($kv['en']) . '</div>'
+            . '<div class="hb-kategori__desc">' . esc_html($kat_ger ?: ($kv['desc'] ?? '')) . '</div>';
+        // Türk hukukundaki ağır karşılığı (kanun maddelerinden suç adlarını türet)
+        $tck_ad = ['267' => 'iftira', '125' => 'hakaret', '216' => 'halkı kin ve düşmanlığa tahrik / aşağılama',
+                   '216/2' => 'halkı kin ve düşmanlığa tahrik', '216/3' => 'dini değerleri aşağılama',
+                   '285' => 'soruşturmanın gizliliğini ihlal', '288' => 'adil yargılamayı etkilemeye teşebbüs'];
+        $suclar = []; $gorulen = [];
+        if (is_array($kanunlar)) {
+            foreach ($kanunlar as $km) {
+                if (($km['kanun'] ?? '') === 'TCK') {
+                    $m = trim((string) ($km['madde'] ?? ''));
+                    $ad = $tck_ad[$m] ?? ($tck_ad[explode('/', $m)[0]] ?? null);
+                    if ($ad && !in_array($ad, $gorulen, true)) {
+                        $gorulen[] = $ad;
+                        $suclar[] = $ad . ' (TCK m.' . $m . ')';
+                    }
+                }
+            }
+        }
+        if ($suclar) {
+            $n = count($suclar);
+            if ($n === 1) { $liste = $suclar[0]; $sz = 'suçunu'; }
+            else { $son = array_pop($suclar); $liste = implode(', ', $suclar) . ' ve ' . $son; $sz = 'suçlarını'; }
+            $h .= '<div class="hb-kategori__hukuk"><strong>Türk hukuku bakımından:</strong> haberdeki ifadeler '
+                . esc_html($liste) . ' ' . $sz . ' oluşturabilecek nitelik taşımaktadır.</div>';
+        }
+        if ($halk) {
+            $h .= '<div class="hb-kategori__halk">Halk diliyle, en hafif tabirle: '
+                . '<strong>“' . esc_html($halk) . '”</strong></div>';
+        }
+        $h .= '</div>';
+    }
 
     // Tespit edilen haber sorunu (varsa) — en üstte belirgin banner
     if (is_array($sorun)) {
@@ -132,6 +182,14 @@ function haberler_dosya_render($content) {
     if ($ozet) $h .= '<h2>' . haberler_ic('doc') . 'Özet</h2><p>' . nl2br(esc_html($ozet)) . '</p>';
     if ($gd)   $h .= '<h2>' . haberler_ic('scale') . 'Genel Değerlendirme</h2><div class="hb-gd">' . nl2br(esc_html($gd)) . '</div>';
 
+    // Suçlamanın araçsallaştırılması — 'FETÖ' yaftasının siyaseten silah olarak kullanımı
+    if ($aracnot) {
+        $h .= '<div class="hb-arac">'
+            . '<div class="hb-arac__ust">Suçlamanın Araçsallaştırılması · <span>Weaponization of the “FETÖ” Label</span></div>'
+            . '<div class="hb-arac__metin">' . nl2br(esc_html($aracnot)) . '</div>'
+            . '</div>';
+    }
+
     // İhlal edilen / risk altındaki temel haklar
     if (is_array($ihlal) && $ihlal) {
         $hli = '';
@@ -141,6 +199,24 @@ function haberler_dosya_render($content) {
         if ($hli) {
             $h .= '<h2>' . haberler_ic('scale') . 'İhlal Edilen / Risk Altındaki Haklar</h2>';
             $h .= '<ul class="hb-haklar">' . $hli . '</ul>';
+        }
+    }
+
+    // İlgili kanun maddeleri (yerel hukuk — Anayasa / TCK / Basın Kanunu)
+    if (is_array($kanunlar) && $kanunlar) {
+        $kli = '';
+        foreach ($kanunlar as $km) {
+            $kan = trim((string) ($km['kanun'] ?? ''));
+            $mad = trim((string) ($km['madde'] ?? ''));
+            $grk = trim((string) ($km['gerekce'] ?? ''));
+            if (!$kan && !$mad) continue;
+            $etk = trim($kan . ($mad !== '' ? ' m.' . $mad : ''));
+            $kli .= '<li><span class="hb-kanun-no">' . esc_html($etk) . '</span>'
+                  . ($grk !== '' ? ' <span class="hb-kanun-ger">' . esc_html($grk) . '</span>' : '') . '</li>';
+        }
+        if ($kli) {
+            $h .= '<h2>' . haberler_ic('scale') . 'İlgili Kanun Maddeleri (Yerel Hukuk)</h2>';
+            $h .= '<ul class="hb-kanunlar">' . $kli . '</ul>';
         }
     }
 

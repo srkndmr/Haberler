@@ -28,7 +28,10 @@ EVIDENCE_SYS = (
 "Senin işin: haberin OLGULARINI ve bunları yayımlayan/doğrulayan mecra kaynaklarını bulmak; isnadın haberdeki "
 "HUKUKİ STATÜSÜNÜ (iddia / soruşturma / iddianame / yerel mahkeme kararı / kesinleşmiş mahkûmiyet) saptamak. "
 "Düz metin döndür: (1) haberin/iddiaların kısa özeti, (2) her iddia için olgusal kanıt ve kaynak (mecra + varsa link), "
-"(3) isnadın hukuki statüsü. Tarafsız ol; uydurma yok.")
+"(3) isnadın hukuki statüsü. AYRICA her iddia için PRİMER kaynağı izlemeye çalış: iddia birincil bir belgeye/"
+"resmi kayda mı dayanıyor, yoksa yalnızca başka medya haberlerine / 'belirtiliyor-konuşuluyor' gibi anonim "
+"aktarımlara mı? Vefat etmiş kişilere ya da üçüncü ağıza atfedilen alıntıların doğrulanıp doğrulanamadığını not et. "
+"Tarafsız ol; uydurma yok.")
 
 CLAUDE_SYS = (
 "Sen kıdemli bir doğruluk denetimi analisti ve insan hakları/medya hukuku editörüsün. Sana bir haber başlığı "
@@ -57,11 +60,60 @@ CLAUDE_SYS = (
 "Aksoy 1996 = işkence (m.3).\n"
 "- Olgu/yorum ayır; nötr dil; uydurma yok; tek tarafın beyanıyla 'doğru/yanlış' İLAN ETME.\n"
 "- Bir grubu/topluluğu TOPTAN suçlu/dışlayıcı gösteren ifadeler olgu değildir.\n"
+"=== TÜRK BASINI FETÖ/GÜLEN HABERCİLİĞİ — KRİTİK OKUMA (ÇOK ÖNEMLİ) ===\n"
+"Bir haber editörü VE insan hakları uzmanı gözüyle oku. Türk basınında 10+ yıldır süren örüntü: önce bir İDDİA "
+"ortaya atılır, sonra 'haberleştirmek' için içi doldurulur. İDDİANIN HABER YAPILMASI ONU DOĞRU KILMAZ. Şu "
+"teknikleri TEK TEK tespit et ve her birini çürüt:\n"
+"(a) ATIF ZİNCİRİ: Haber, çoğu zaman daha önceki (çürütülmemiş) yalan haberlere/iddialara dayanır. 'belirtiliyor, "
+"konuşuluyor, dile getiriliyor, öğrenildi, iddia edildi, biliniyor' gibi PASİF/KAYNAKSIZ kalıplar PRİMER kaynak "
+"DEĞİLDİR → doğrulanamaz/mesnetsiz say; haberin dayandığı atfı da sorgula, kaynağa inilemiyorsa belirt.\n"
+"(b) ÖLÜ veya ÜÇÜNCÜ-AĞIZ ALINTILARI: Vefat etmiş kişilere (ör. yıllar önce ölmüş siyasiler) ya da 'bir "
+"arkadaşına söylediği iddia edilen', 'şu ifadeleri kullandı' biçiminde aktarılan sözler DOĞRULANAMAZ — kişinin "
+"gerçekten söyleyip söylemediği teyit edilemez; bunları olgu gibi sunma, attribüsyonu sorgula.\n"
+"(c) ESKİ OLAYLAR: 15-45 yıl önceki olaylar (darbeler, kaset kumpasları, eski seçimler, istifalar) hakkında "
+"'FETÖ tertibiydi' türü kesin anlatımlar, KESİNLEŞMİŞ mahkeme hükmü olmadıkça doğrulanamaz; zamanın geçmesi "
+"iddiayı kanıt yapmaz.\n"
+"(d) YÖNLENDİRİLMİŞ/İTİRAFÇI İFADE: Menfaat/baskı altında alınmış 'itirafçı' beyanlarıyla, cemaatin hiç "
+"yapmadığı şeyler suçlama olarak kurulabilir; tek taraflı itirafçı beyanı kanıt sayma.\n"
+"(e) YAŞAYAN İSİMLER: Yaşayan kişileri ismen 'örgüt üyesi/bağlantılı/militan/kripto' göstermek, kesinleşmiş "
+"mahkûmiyet yoksa İFTİRA ve masumiyet karinesi ihlalidir. Her ismi AYRI iddia yap.\n"
+"(f) ANONİM İNSİNÜASYON: 'eşi bağlantılı olan isim', 'kripto isimler', 'bazı milletvekilleri' gibi muğlak "
+"hedef göstermeler mesnetsizdir.\n"
+"ENUMERASYON: Tek bir haberde ÇOK SAYIDA (çoğu kez 10+) ayrı yalan/iftira/çarpıtma bulunur. BUNLARI BİRLEŞTİRME; "
+"her tekniği/iddiayı/alıntıyı/tarihi AYRI bir iddialar[] kalemi yap ve tek tek çürüt. Haberin TAM METNİNİ (sadece "
+"başlığı değil) bu gözle tara.\n"
+"(g) SUÇLAMANIN ARAÇSALLAŞTIRILMASI (WEAPONIZATION): 'FETÖ/terör örgütü üyeliği' suçlaması Türkiye'de çoğu kez "
+"somut bir örgüt bağına değil, hedef kişiyi/grubu siyaseten itibarsızlaştırmaya yarayan AKIŞKAN bir YAFTA olarak "
+"kullanılır. Aynı yafta siyasi konjonktüre göre yön değiştirir: bir dönem iktidara yakın gazeteler bir muhalifi "
+"(ör. Kılıçdaroğlu) 'FETÖ'cü' ilan ederken başka dönem tersini yapar; dün CHP AKP'yi, bugün tersi suçlar; hatta "
+"hiç alakası olmayan kişilere (ör. Rahip Brunson) ya da 13-14 yaşındaki çocuklara bile yöneltilir. Eğer haberde "
+"'FETÖ' suçlaması KANITA dayalı bir isnattan çok bu tür ARAÇSALLAŞTIRILMIŞ/silah haline getirilmiş bir yafta "
+"olarak kullanılıyorsa, araclastirma alanına 2-4 cümlelik bir not yaz: kime karşı, hangi siyasi amaçla "
+"kullanıldığını, varsa yön değiştirme/çifte standart örüntüsünü açıkla. Bunun habercilik değil, haberciliğin "
+"insanları hizaya sokma/siyasi rakibi tasfiye etme aracı olarak kullanılması olduğunu vurgula. Araçsallaştırma "
+"yoksa araclastirma'yı boş bırak.\n"
+"(h) MECRANIN TUTUMU (FAİL mi, İFŞACI mı?): Haberi yayımlayan mecranın konumunu ayırt et. Mecra yaftayı/"
+"suçlamayı KENDİSİ mi üretiyor/savunuyor (failin yanında, hedef gösteriyor) — YOKSA bu absürtlüğü/haksızlığı/"
+"araçsallaştırmayı ELEŞTİREL biçimde TEŞHİR mi ediyor (bağımsız gazetecilik, mağdurun/kamu yararının yanında, "
+"ironi/eleştiri ile)? EĞER mecra weaponization'ı veya haksız suçlamayı ifşa/eleştiri amacıyla aktarıyorsa, sorun "
+"O HABERDE DEĞİLDİR: haber_sorunu=[\"sorun_yok\"], medya_kategori=kabul_edilebilir yap; çarpıtmayı/iftirayı "
+"yaftayı ÜRETEN faile (iddianame/iktidar yanlısı kaynak) ata ve araclastirma'da bunu açıkla. Yalnızca yaftayı "
+"ÜRETEN/SAVUNAN/yayan yayınları sorunlu işaretle. Eleştirel/bağımsız haberciliği cezalandırma.\n"
 "- İHLAL EDİLEN HAKLAR: Haberin veya aktardığı sürecin hangi temel hak ve özgürlükleri ihlal ettiğini/risk "
 "altına aldığını belirle ve ihlal_edilen_haklar dizisine ekle. Anahtarlar: ozel_hayat (özel hayatın gizliliği — "
 "isim/foto/aile/evlilik gibi mahrem detayların ifşası), din_vicdan (din ve vicdan özgürlüğü), orgutlenme "
 "(dernek/vakıf/örgütlenme özgürlüğü), masumiyet (masumiyet karinesi), adil_yargilanma, kanunsuz_ceza, ifade, "
-"ayrimcilik. Yalnızca gerçekten zedelenen hakları seç; genel_degerlendirme'de kısaca nasıl zedelendiğini belirt.\n"
+"ayrimcilik, kisi_hurriyeti (kişi hürriyeti ve güvenliği), seref_itibar (şeref ve itibarın korunması). "
+"Yalnızca gerçekten zedelenen hakları seç; genel_degerlendirme'de kısaca nasıl zedelendiğini belirt.\n"
+"- İLGİLİ KANUN MADDELERİ (YEREL HUKUK): Haberin/sunumun ihlal ettiği ya da kapsamına girdiği SOMUT yerel "
+"mevzuat maddelerini kanun_maddeleri dizisine ekle. Sadece uluslararası (AİHS) değil, Türk hukukundaki karşılığını "
+"da göster. Bir hukukçu gibi yalnızca GERÇEKTEN uygulanabilir maddeleri, kısa gerekçeyle seç (zorlama yapma; "
+"uygun madde yoksa boş dizi []). Tipik adaylar: TCK m.267 (iftira — gerçek dışı somut suç isnadı), TCK m.125 "
+"(hakaret/şeref saldırısı), TCK m.216 (halkı kin ve düşmanlığa tahrik veya bir kesimi aşağılama — toptan suçlama/"
+"grubu hedef alma), TCK m.285 (soruşturmanın gizliliğini ihlal), TCK m.288 (adil yargılamayı etkilemeye teşebbüs); "
+"Anayasa karşılıkları: m.38/4 (masumiyet), m.36 (adil yargılanma), m.26 (ifade), m.20 (özel hayat), m.17 (şeref); "
+"ayrıca Basın Kanunu m.3 (doğru haber alma hakkı/basın özgürlüğü sınırı). Her madde için kanun (TCK/Anayasa/"
+"Basın Kanunu), madde (örn '267' veya '216/2'), gerekce (bu habere neden uyduğu, 1-2 cümle) ver.\n"
 "- ÇOKLU KAYNAK: Haber birden çok mecrada yer aldıysa (sana MECRALAR listesi verilecek), "
 "genel_degerlendirme'de bunu belirt (kaç mecra ve başlıcaları) ve aynı iddianın çok sayıda mecrada "
 "eşzamanlı yayımının kayda değer bir olgu olduğunu not et; ancak bu tek başına suç/iftira kanıtı değildir.\n"
@@ -69,12 +121,30 @@ CLAUDE_SYS = (
 "kanıtla TAM ve şüphesiz doğrulanıyorsa verilir. Bir kısmı doğru bir kısmı kanıtsız/çarpıtılmışsa 'dogru' DEME → "
 "dogrulanamaz veya yanlis kullan ve haber_sorunu'na carpitma ekle. 'kısmen doğru' (kismen_dogru) KULLANMA.\n"
 "HABER SORUNU (haber_sorunu dizisi): yalan_haber|iftira|toptan_suclama|carpitma — hiçbiri yoksa [\"sorun_yok\"].\n"
+"MEDYA KATEGORİSİ (medya_kategori — TEK anahtar): Haberin uluslararası habercilik/dezenformasyon "
+"literatüründeki karşılığını, SORUNLARIN YOĞUNLUĞU VE AĞIRLIĞINA göre ata. Kademeler (ağırdan hafife):\n"
+"  • kara_propaganda = Black Propaganda / Character Assassination (Hedef Gösterme): EN AĞIR. Kurgulanmış, "
+"sistematik iftira; yaşayan kişileri delilsiz suçlu/örgüt üyesi ilan etme; nefrete tahrik; çok sayıda (≈4+) ayrı "
+"yalan/iftira. 'Habercilik' sayılmaz — medya eliyle yargısız infaz. (Genelde yalan_haber+iftira+toptan_suclama "
+"birlikte ve TCK 216/267 devrede.)\n"
+"  • dezenformasyon = Disinformation / Defamatory Smear: Kasıtlı yalan ve iftira ağırlıklı, zarar niyeti belirgin.\n"
+"  • manipulatif = Yellow Journalism / Misleading Spin: Çarpıtma, bağlam saptırma, sansasyon, tek taraflılık.\n"
+"  • dogrulanmamis = Misinformation / Unverified: Kaynaksız/doğrulanmamış ama kötü niyet açık değil.\n"
+"  • kabul_edilebilir = Acceptable Reporting: Belirgin etik ihlali yok.\n"
+"kategori_gerekce: bu kademeyi neden seçtiğini 1-2 cümleyle yaz. Abartma; kanıta dayan ama hak ettiği ağır "
+"terimden de KAÇINMA.\n"
+"HALK TABİRİ (halk_tabiri): Bu tür bir yayın için Türk halkının/hukukçunun kullanacağı, amiyane ama YERİNDE "
+"ve ağır bir tabir yaz — 'en hafif tabirle ...' mantığıyla, kısa (2-4 kelime). Örnekler: 'çamur atma', "
+"'kara çalma', 'fişleme/kumpas gazeteciliği', 'talimatlı karalama', 'linç kampanyası'. Küfür/hakaret etme; "
+"yalnızca yayının habercilik etiği dışı oluşunu halk diliyle özetleyen tabiri seç. Sorun yoksa boş bırak.\n"
 "İNGİLİZCE: Uluslararası (AİHM) okuyucu için ayrıca İngilizce çeviri alanları doldur: baslik_en "
 "(başlığın İngilizcesi), ozet_en, genel_degerlendirme_en (aynı içeriğin akıcı İngilizcesi).\n"
 "SADECE şu şemada geçerli JSON döndür (markdown YOK):\n"
 '{"ozet":"3-5 cümle","genel_degerlendirme":"3-5 cümle, hukuki statü + AİHM/AYM dayanağı dahil",'
 '"baslik_en":"English title","ozet_en":"English summary","genel_degerlendirme_en":"English assessment",'
-'"haber_sorunu":["..."],"ihlal_edilen_haklar":["ozel_hayat","din_vicdan","orgutlenme",...],'
+'"medya_kategori":"kara_propaganda|dezenformasyon|manipulatif|dogrulanmamis|kabul_edilebilir","kategori_gerekce":"1-2 cümle","halk_tabiri":"amiyane 2-4 kelime","araclastirma":"2-4 cümle veya boş",'
+'"haber_sorunu":["..."],"ihlal_edilen_haklar":["masumiyet","ifade",...],'
+'"kanun_maddeleri":[{"kanun":"TCK","madde":"267","gerekce":"neden uyuyor, 1-2 cümle"}],'
 '"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: kriter + kanıt","dayanak_kaynak_url":"yalnızca tam http(s) URL; yoksa boş, kaynak adı YAZMA"}],'
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
@@ -89,7 +159,7 @@ def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
     mec = ""
     if mecralar:
         mec = f"\n\nMECRALAR ({len(mecralar)} mecrada yer aldı): {', '.join(mecralar)}"
-    body = json.dumps({"model": model, "max_tokens": 3000, "temperature": 0.2, "system": CLAUDE_SYS,
+    body = json.dumps({"model": model, "max_tokens": 8000, "temperature": 0.2, "system": CLAUDE_SYS,
         "messages": [{"role": "user", "content": f"BAŞLIK: {baslik}\n\nHABER BAĞLAMI: {metin}{mec}\n\n=== ARAŞTIRMA BRİFİ (Gemini) ===\n{brief}"}]}).encode()
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
         headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
@@ -97,6 +167,48 @@ def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
     t = data["content"][0]["text"]; m = re.search(r"\{.*\}", t, re.DOTALL)
     if not m: raise ValueError("Claude JSON döndürmedi")
     return json.loads(m.group(0))
+
+PROOF_SYS = (
+"Sen titiz bir Türkçe düzeltmen/editörsün. Sana bir doğruluk denetimi raporunun JSON çıktısı verilecek. "
+"GÖREVİN YALNIZCA DİL DÜZELTME: yazım/imla hatalarını, bozuk veya eksik kelimeleri, devrik ve düşük cümleleri, "
+"noktalama ve akıcılık sorunlarını düzelt; metni anlaşılır, düzgün ve akıcı Türkçeye çevir.\n"
+"KESİNLİKLE DEĞİŞTİRME: anlamı, hükmü, sınıflandırmayı; kanun adlarını/madde numaralarını; kişi-kurum adlarını; "
+"URL'leri; tarihleri. Yeni olgu/iddia UYDURMA, var olanı çıkarma. Sadece İFADEYİ düzelt.\n"
+"Sana verilen JSON şemasını AYNEN, tüm anahtarlarıyla, yalnızca Türkçe metin alanları düzeltilmiş halde döndür. "
+"İngilizce (_en) alanlarda yalnızca bariz yazım hatası varsa düzelt. Markdown YOK, sadece geçerli JSON.")
+
+def claude_proofread(analiz, key, model):
+    """İkinci geçiş: yalnızca Türkçe dil düzeltme. Yapısal alanlar orijinalden korunur (güvenli merge)."""
+    try:
+        body = json.dumps({"model": model, "max_tokens": 8000, "temperature": 0, "system": PROOF_SYS,
+            "messages": [{"role": "user", "content": "Şu raporun metinlerini düzelt:\n" + json.dumps(analiz, ensure_ascii=False)}]}).encode()
+        req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
+            headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
+        data = json.loads(urllib.request.urlopen(req, timeout=90).read())
+        t = data["content"][0]["text"]; m = re.search(r"\{.*\}", t, re.DOTALL)
+        if not m: return analiz
+        d = json.loads(m.group(0))
+    except Exception as e:
+        print(f"    (dil düzeltmesi atlandı: {e})"); return analiz
+    out = dict(analiz)
+    # Düz metin alanları: düzeltilmiş halini al
+    for f in ("ozet", "genel_degerlendirme", "baslik_en", "ozet_en", "genel_degerlendirme_en",
+              "kategori_gerekce", "halk_tabiri", "araclastirma", "isim_verilen_suclama_gerekce"):
+        if isinstance(d.get(f), str) and d[f].strip():
+            out[f] = d[f]
+    # İddialar: yalnızca metin+gerekçe düzelt; siniflandirma ve URL korunur
+    di = d.get("iddialar")
+    if isinstance(di, list) and len(di) == len(analiz.get("iddialar", [])):
+        for orig, fix in zip(out["iddialar"], di):
+            if isinstance(fix, dict):
+                if isinstance(fix.get("iddia_metni"), str) and fix["iddia_metni"].strip(): orig["iddia_metni"] = fix["iddia_metni"]
+                if isinstance(fix.get("gerekce"), str) and fix["gerekce"].strip(): orig["gerekce"] = fix["gerekce"]
+    # Kanun maddeleri: yalnızca gerekçe düzelt; kanun adı + madde no korunur
+    dk = d.get("kanun_maddeleri")
+    if isinstance(dk, list) and len(dk) == len(analiz.get("kanun_maddeleri", [])):
+        for orig, fix in zip(out["kanun_maddeleri"], dk):
+            if isinstance(fix, dict) and isinstance(fix.get("gerekce"), str) and fix["gerekce"].strip(): orig["gerekce"] = fix["gerekce"]
+    return out
 
 def wp_create(title, analiz, kaynaklar):
     valid = {"dogru","yanlis","dogrulanamaz","mesnetsiz","gorus"}  # kismen_dogru kullanılmıyor
@@ -106,8 +218,12 @@ def wp_create(title, analiz, kaynaklar):
                  "gerekce": str(x.get("gerekce","")), "dayanak_kaynak_url": resolve(x.get("dayanak_kaynak_url","") or "")}
                 for x in analiz.get("iddialar", [])]
     hs = [s for s in (analiz.get("haber_sorunu") or []) if s in sorunlar] or ["sorun_yok"]
-    haklar_ok = {"ozel_hayat","din_vicdan","orgutlenme","masumiyet","adil_yargilanma","kanunsuz_ceza","ifade","ayrimcilik"}
+    haklar_ok = {"ozel_hayat","din_vicdan","orgutlenme","masumiyet","adil_yargilanma","kanunsuz_ceza","ifade","ayrimcilik","kisi_hurriyeti","seref_itibar"}
     ih = [h for h in (analiz.get("ihlal_edilen_haklar") or []) if h in haklar_ok]
+    kanunlar = [{"kanun": str(k.get("kanun",""))[:40], "madde": str(k.get("madde",""))[:20], "gerekce": str(k.get("gerekce",""))[:600]}
+                for k in (analiz.get("kanun_maddeleri") or []) if (k.get("kanun") or k.get("madde"))]
+    kat_ok = {"kara_propaganda","dezenformasyon","manipulatif","dogrulanmamis","kabul_edilebilir"}
+    mk = analiz.get("medya_kategori") if analiz.get("medya_kategori") in kat_ok else ""
     isim = "hayir" if analiz.get("isim_verilen_suclama") == "hayir" else "evet"
     payload = {"title": title[:120], "status": "draft",
         "content": "",  # içerik analiz bölümlerinden (the_content filtresi) gelir; placeholder yok
@@ -115,7 +231,12 @@ def wp_create(title, analiz, kaynaklar):
                  "haberler_baslik_en": analiz.get("baslik_en",""), "haberler_ozet_en": analiz.get("ozet_en",""),
                  "haberler_genel_degerlendirme_en": analiz.get("genel_degerlendirme_en",""),
                  "haberler_haber_sorunu": json.dumps(hs, ensure_ascii=False),
+                 "haberler_medya_kategori": mk,
+                 "haberler_kategori_gerekce": analiz.get("kategori_gerekce",""),
+                 "haberler_halk_tabiri": str(analiz.get("halk_tabiri",""))[:120],
+                 "haberler_araclastirma": str(analiz.get("araclastirma",""))[:1200],
                  "haberler_ihlal_haklar": json.dumps(ih, ensure_ascii=False),
+                 "haberler_kanun_maddeleri": json.dumps(kanunlar, ensure_ascii=False),
                  "haberler_isim_verilen_suclama": isim, "haberler_isim_suclama_gerekce": analiz.get("isim_verilen_suclama_gerekce",""),
                  "haberler_kaynaklar": json.dumps(kaynaklar, ensure_ascii=False), "haberler_iddialar": json.dumps(iddialar, ensure_ascii=False)}}
     auth = base64.b64encode(f"{USER}:{APP}".encode()).decode()
@@ -154,7 +275,12 @@ def process_one(baslik, metin, kaynaklar=None):
         if brief.strip(): break
         time.sleep(5)
     if not brief.strip():
-        print("    ✗ Gemini kanıt yok (atlandı)"); return None
+        print("    ⚠ Gemini kanıt yok — yalnızca başlık/çerçeve ile değerlendirilecek (kaynaksız)")
+        brief = ("(Bağımsız web araştırması yapılamadı — kota/erişim yok. Değerlendirme YALNIZCA haberin "
+                 "başlığı ve çerçevesi üzerinden: somut iddialar bağımsız kanıtla doğrulanamaz kabul edilmeli; "
+                 "ancak iftira, çarpıtma, toptan suçlama gibi ÇERÇEVE/SUNUM sorunları metnin kendisinden tespit "
+                 "edilebilir. Kaynak listesi boş.)")
+        sources = []
     try:
         analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL, mecralar)
     except Exception as e:
@@ -165,6 +291,10 @@ def process_one(baslik, metin, kaynaklar=None):
     hs_real = [s for s in (analiz.get("haber_sorunu") or []) if s in {"yalan_haber", "iftira", "toptan_suclama", "carpitma"}]
     if os.environ.get("HIBRIT_ONLY_PROBLEM", "1") != "0" and not hs_real:
         print("    ↷ Belirgin sorun yok (nötr haber) — kaydedilmedi"); return None
+    # Son geçiş: dil/redaksiyon düzeltmesi (yapısal alanlar korunur)
+    if os.environ.get("HIBRIT_PROOFREAD", "1") != "0":
+        analiz = claude_proofread(analiz, CKEY, CMODEL)
+        print("    ✎ dil düzeltmesi yapıldı")
     if not kaynaklar:  # clustering yoksa Gemini'nin bulduğu kaynaklar
         kaynaklar = [{"kaynak_adi": t or "kaynak", "orijinal_url": resolve(u), "yayin_tarihi": ""} for t, u in sources[:8]]
     pid = wp_create(baslik, analiz, kaynaklar).get("id")

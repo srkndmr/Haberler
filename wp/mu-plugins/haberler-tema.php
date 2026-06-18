@@ -67,6 +67,40 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-sorun strong{ color:#a01722; }
 .hb-sorun__ic{ font-weight:700; margin-right:.2em; }
 
+/* Uluslararası habercilik değerlendirmesi — kademeli kategori banner */
+.hb-kategori{ border-radius:14px; padding:16px 20px; margin:0 0 16px; border:1px solid transparent; }
+.hb-kategori__ust{ font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; opacity:.75; font-weight:600; }
+.hb-kategori__ad{ font-size:1.4rem; font-weight:800; line-height:1.2; margin-top:2px; }
+.hb-kategori__en{ font-size:.92rem; font-style:italic; opacity:.85; margin-top:1px; }
+.hb-kategori__desc{ font-size:.95rem; line-height:1.55; margin-top:8px; opacity:.95; }
+.hb-kategori__hukuk{ font-size:.92rem; margin-top:10px; padding-top:9px; border-top:1px solid rgba(255,255,255,.15); }
+.hb-kategori__halk{ font-size:.98rem; margin-top:7px; }
+.hb-kategori--sev3 .hb-kategori__hukuk, .hb-kategori--sev2 .hb-kategori__hukuk, .hb-kategori--sev1 .hb-kategori__hukuk{ border-top-color:rgba(0,0,0,.1); }
+.hb-kategori--sev5{ background:#1b0d0d; border-color:#3a1414; color:#ffd9d4; }
+.hb-kategori--sev5 .hb-kategori__ad{ color:#ff6b5e; }
+.hb-kategori--sev4{ background:#fbe9e7; border-color:#e6a79f; color:#7a241b; }
+.hb-kategori--sev4 .hb-kategori__ad{ color:#b3261e; }
+.hb-kategori--sev3{ background:#fdf3e3; border-color:#e8c98c; color:#7a571a; }
+.hb-kategori--sev3 .hb-kategori__ad{ color:#b07d12; }
+.hb-kategori--sev2{ background:#f3f5f8; border-color:#cdd5e0; color:#3a4658; }
+.hb-kategori--sev2 .hb-kategori__ad{ color:#516079; }
+.hb-kategori--sev1{ background:#eef7ef; border-color:#bcdcc1; color:#2c5733; }
+.hb-kategori--sev1 .hb-kategori__ad{ color:#2e7d39; }
+/* Suçlamanın araçsallaştırılması callout */
+.hb-arac{ background:#f3f0fb; border:1px solid #d4c8f0; border-left:5px solid #6d4bc4; border-radius:12px;
+  padding:14px 18px; margin:18px 0; }
+.hb-arac__ust{ font-weight:800; color:#4b2e9c; font-size:1.05rem; margin-bottom:6px; }
+.hb-arac__ust span{ font-weight:500; font-style:italic; font-size:.9rem; opacity:.8; }
+.hb-arac__metin{ color:#3a2d5e; line-height:1.6; }
+
+/* Liste rozeti */
+.hb-kat-rozet{ display:inline-block; padding:3px 11px; border-radius:999px; font-size:.78rem; font-weight:700; }
+.hb-kat-rozet--sev5{ background:#1b0d0d; color:#ff8478; }
+.hb-kat-rozet--sev4{ background:#b3261e; color:#fff; }
+.hb-kat-rozet--sev3{ background:#b07d12; color:#fff; }
+.hb-kat-rozet--sev2{ background:#516079; color:#fff; }
+.hb-kat-rozet--sev1{ background:#2e7d39; color:#fff; }
+
 /* Değerlendirme kutusu (verdict) */
 .hb-verdict{ background:linear-gradient(180deg,#fbfdfd, #f2f7f7); border:1px solid #d8e6e6;
   border-radius:16px; padding:18px 20px; margin:18px 0 24px; box-shadow:var(--shadow); }
@@ -110,6 +144,11 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-haklar{ list-style:none; padding:0; margin:.6rem 0; display:flex; flex-direction:column; gap:8px; }
 .hb-haklar li{ background:#fff5f5; border:1px solid #f3c0c0; border-left:4px solid var(--c-yanlis);
   border-radius:8px; padding:9px 14px; font-weight:500; color:#7a1f23; }
+.hb-kanunlar{ list-style:none; padding:0; margin:.6rem 0; display:flex; flex-direction:column; gap:8px; }
+.hb-kanunlar li{ background:#f4f6fb; border:1px solid #cdd7ea; border-left:4px solid #3a5a9c;
+  border-radius:8px; padding:9px 14px; color:#243a63; line-height:1.5; }
+.hb-kanun-no{ font-weight:700; color:#1f3460; }
+.hb-kanun-ger{ font-weight:400; color:#3d4f72; }
 .hb-en{ margin-top:1.8rem; border:1px solid var(--hb-line); border-radius:12px; padding:4px 18px; background:var(--hb-soft); }
 .hb-en summary{ cursor:pointer; font-weight:600; color:var(--hb-accent); padding:10px 0; list-style:none; }
 .hb-en summary::-webkit-details-marker{ display:none; }
