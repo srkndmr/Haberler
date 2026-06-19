@@ -149,10 +149,16 @@ CLAUDE_SYS = (
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
 def resolve(u):
+    """Yönlendirme linklerini (grounding redirect + Google News RSS) gerçek mecra URL'sine çöz."""
     u = (u or "").split(",")[0].strip()
-    if not u or "grounding-api-redirect" not in u: return u
+    if not u: return u
+    if "grounding-api-redirect" not in u and "news.google.com" not in u: return u
     try:
-        r = urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"}), timeout=12); f = r.geturl(); r.close(); return f or u
+        r = urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0"}), timeout=12)
+        f = r.geturl(); r.close()
+        # Google içi bir sayfaya düştüyse (consent/redirect çözülemedi) orijinali koru
+        if f and "google.com" not in (f.split("/", 3)[2] if "://" in f else f): return f
+        return u
     except Exception: return u
 
 def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
@@ -297,6 +303,10 @@ def process_one(baslik, metin, kaynaklar=None):
         print("    ✎ dil düzeltmesi yapıldı")
     if not kaynaklar:  # clustering yoksa Gemini'nin bulduğu kaynaklar
         kaynaklar = [{"kaynak_adi": t or "kaynak", "orijinal_url": resolve(u), "yayin_tarihi": ""} for t, u in sources[:8]]
+    # Kaynak linki güvencesi: en az bir geçerli http(s) link olmalı
+    gecerli = [k for k in (kaynaklar or []) if str(k.get("orijinal_url", "")).startswith("http")]
+    if not gecerli:
+        print("    ⚠ UYARI: orijinal haber linki yok — dosyada 'kaynak eksik' uyarısı görünecek; inceleme şart")
     pid = wp_create(baslik, analiz, kaynaklar).get("id")
     print(f"    ✓ taslak ID={pid} | mecra={len(mecralar) or len(kaynaklar)} | sorun={analiz.get('haber_sorunu')} | iddia={len(analiz.get('iddialar', []))}")
     return pid
@@ -334,7 +344,7 @@ def main():
         kayn = {}
         for m in c["uyeler"]:
             ad = m.get("kaynak_adi") or "kaynak"
-            kayn.setdefault(ad, {"kaynak_adi": ad, "orijinal_url": m.get("orijinal_url", ""), "yayin_tarihi": m.get("yayin_tarihi", "")})
+            kayn.setdefault(ad, {"kaynak_adi": ad, "orijinal_url": resolve(m.get("orijinal_url", "")), "yayin_tarihi": m.get("yayin_tarihi", "")})
         print(f"\n[küme: {len(kayn)} mecra — {', '.join(list(kayn)[:5])}]")
         pid = process_one(rep["baslik"], rep.get("ozet", ""), list(kayn.values()))
         with open(state, "a", encoding="utf-8") as fh:   # kümedeki tüm URL'ler işaretlenir

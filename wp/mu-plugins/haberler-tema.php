@@ -93,6 +93,10 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-arac__ust span{ font-weight:500; font-style:italic; font-size:.9rem; opacity:.8; }
 .hb-arac__metin{ color:#3a2d5e; line-height:1.6; }
 
+/* Kaynak linki eksik uyarısı */
+.hb-kaynak-uyari{ background:#fff7e6; border:1px solid #f0d090; border-left:5px solid #d99100; color:#7a5800;
+  border-radius:10px; padding:12px 16px; margin:14px 0; font-size:.97rem; }
+
 /* Liste rozeti */
 .hb-kat-rozet{ display:inline-block; padding:3px 11px; border-radius:999px; font-size:.78rem; font-weight:700; }
 .hb-kat-rozet--sev5{ background:#1b0d0d; color:#ff8478; }

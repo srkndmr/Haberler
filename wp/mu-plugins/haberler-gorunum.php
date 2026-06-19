@@ -266,6 +266,18 @@ function haberler_dosya_render($content) {
         $h .= '</ul>';
     }
 
+    // Kaynak linki güvencesi: geçerli http(s) link yoksa belirgin uyarı (yayından önce düzeltilmeli)
+    $gecerli_link = false;
+    if (is_array($kay)) {
+        foreach ($kay as $k) {
+            if (!empty($k['orijinal_url']) && preg_match('#^https?://#i', $k['orijinal_url'])) { $gecerli_link = true; break; }
+        }
+    }
+    if (!$gecerli_link) {
+        $h .= '<div class="hb-kaynak-uyari">⚠ <strong>Orijinal haber linki eksik.</strong> '
+            . 'Bu dosya yayımlanmadan önce kaynağın doğrulanabilir bağlantısı eklenmelidir.</div>';
+    }
+
     if ($ozet_en || $gd_en) {
         $h .= '<details class="hb-en"><summary>🌐 In English</summary>';
         if ($baslik_en) $h .= '<h3>' . esc_html($baslik_en) . '</h3>';
