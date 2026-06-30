@@ -18,7 +18,9 @@ gem = _load("gem", "gemini-analiz.py")
 ayl = _load("ayl", "aylik-tarama.py")
 
 GKEY = os.environ.get("GEMINI_API_KEY"); GMODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-CKEY = os.environ.get("ANTHROPIC_API_KEY"); CMODEL = os.environ.get("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+CKEY = os.environ.get("ANTHROPIC_API_KEY"); CMODEL = os.environ.get("ANTHROPIC_MODEL", "claude-opus-4-8")
+# Redaksiyon (dil düzeltme) ucuz model — analizden ayrı tutulur
+PMODEL = os.environ.get("ANTHROPIC_PROOFREAD_MODEL", "claude-haiku-4-5-20251001")
 WP = os.environ.get("WP_URL", "http://localhost:8091"); USER = os.environ.get("WP_USER", "pipeline-bot"); APP = os.environ.get("WP_APP_PASS")
 
 EVIDENCE_SYS = (
@@ -37,9 +39,14 @@ CLAUDE_SYS = (
 "Sen kıdemli bir doğruluk denetimi analisti ve insan hakları/medya hukuku editörüsün. Sana bir haber başlığı "
 "ve bir ARAŞTIRMA BRİFİ (web + AİHM/AYM/Yargıtay bulguları) verilecek. Bu kanıtı kullanarak AKICI, ölçülü, "
 "hukuk-gazetecilik dilinde TARAFSIZ bir TASLAK rapor üret.\n"
-"ÜSLUP: Deneyimli bir insan hakları avukatı ve gazeteci gibi DOĞAL, akıcı, ölçülü yaz. Klişe ve şablon "
-"kalıplardan, her dosyada aynı cümleleri/atıfları tekrarlamaktan kaçın (özellikle 'AİHM'nin X kararında...' "
-"kalıbı yapay durur). İlkeleri kendi cümlelerinle, somut habere bağlayarak anlat.\n"
+"ÜSLUP — İNSANİ VE EDEBİ: Bir köşe yazarı-hukukçu titizliğiyle, AKICI ve EDEBÎ bir Türkçeyle yaz. Mekanik, "
+"maddeleyen, 'rapor dili' kuruluğundan kaçın; gelişmiş paragraflar kur, geçişleri yumuşat, gerektiğinde ölçülü "
+"bir imge veya ironi kullan — ama abartıya, süslemeye ve duygu sömürüsüne kaçma. Metin, deneyimli bir insan "
+"hakları avukatının elinden çıkmış gibi okunmalı: insani, sakin, vicdanlı ama daima kanıta ve hukuka bağlı. "
+"Klişe/şablon kalıplardan, her dosyada aynı cümleleri/atıfları tekrarlamaktan kaçın (özellikle 'AİHM'nin X "
+"kararında...' kalıbı yapay durur). genel_degerlendirme KISA DEĞİL: hukuki statüyü, kanıt durumunu, çerçeve "
+"sorunlarını ve insani boyutu birbirine bağlayan GELİŞMİŞ, ÇOK PARAGRAFLI bir değerlendirme olmalı; ilkeyi "
+"somut olguya uygulayarak, neden-sonuç zinciriyle anlat (yüzeysel tek cümle YASAK).\n"
 "İLKELER:\n"
 "- Masumiyet karinesi: Bir isnadın 'suç' sayılması KESİNLEŞMİŞ mahkûmiyet gerektirir. Kesinleşme yoksa "
 "(iddia/soruşturma/iddianame/yerel karar) kişi 'suçlu/terörist' DEĞİLDİR; medya bunu kesin suçmuş gibi sunuyorsa "
@@ -64,17 +71,30 @@ CLAUDE_SYS = (
 "Bir haber editörü VE insan hakları uzmanı gözüyle oku. Türk basınında 10+ yıldır süren örüntü: önce bir İDDİA "
 "ortaya atılır, sonra 'haberleştirmek' için içi doldurulur. İDDİANIN HABER YAPILMASI ONU DOĞRU KILMAZ. Şu "
 "teknikleri TEK TEK tespit et ve her birini çürüt:\n"
-"(a) ATIF ZİNCİRİ: Haber, çoğu zaman daha önceki (çürütülmemiş) yalan haberlere/iddialara dayanır. 'belirtiliyor, "
-"konuşuluyor, dile getiriliyor, öğrenildi, iddia edildi, biliniyor' gibi PASİF/KAYNAKSIZ kalıplar PRİMER kaynak "
-"DEĞİLDİR → doğrulanamaz/mesnetsiz say; haberin dayandığı atfı da sorgula, kaynağa inilemiyorsa belirt.\n"
+"(a) ATIF ZİNCİRİNİN ÖZYİNELEMELİ DOĞRULANMASI (EN KRİTİK): Sadece haberin değil, DAYANDIĞI ATFIN, hatta "
+"ATFIN ATFININ doğruluğunu ölç. Türk basınında haber çoğu kez daha önce 'haberleşmiş' bir yalana atıf yapar; "
+"sorun şudur ki o önceki haber de yalandır, onun atıf yaptığı da. Zinciri geriye doğru sür: bu iddia nereye "
+"dayanıyor? O kaynak primer bir belgeye/kayda mı, yoksa başka bir habere/iddiaya/anonim aktarıma mı dayanıyor? "
+"Zincirin her halkasını ayrı ayrı tart. ÖNEMLİ KURALLAR: (i) Bir iddianın daha önce haber yapılmış/tekrarlanmış "
+"olması onu DOĞRU KILMAZ — tekrar, kanıt değildir. (ii) Kaynak tamamen YORUM/değer yargısı üzerine konuşmuşsa "
+"bu olgu değildir (siniflandirma=gorus); olgu gibi sunulmuşsa çarpıtmadır. (iii) Kaynak doğrudan YALAN söylüyor "
+"olabilir; beyanın sahibinin kim olduğu ve menfaati sorgulanmalı. (iv) 'belirtiliyor, konuşuluyor, öğrenildi, "
+"iddia edildi, biliniyor' gibi pasif/kaynaksız kalıplar primer kaynak DEĞİLDİR → doğrulanamaz/mesnetsiz. "
+"gerekçede zinciri açıkça yaz: 'Haber X'e dayanıyor; X de kanıt göstermeyen Y haberine dayanıyor; primer belge "
+"yok' gibi.\n"
 "(b) ÖLÜ veya ÜÇÜNCÜ-AĞIZ ALINTILARI: Vefat etmiş kişilere (ör. yıllar önce ölmüş siyasiler) ya da 'bir "
 "arkadaşına söylediği iddia edilen', 'şu ifadeleri kullandı' biçiminde aktarılan sözler DOĞRULANAMAZ — kişinin "
 "gerçekten söyleyip söylemediği teyit edilemez; bunları olgu gibi sunma, attribüsyonu sorgula.\n"
 "(c) ESKİ OLAYLAR: 15-45 yıl önceki olaylar (darbeler, kaset kumpasları, eski seçimler, istifalar) hakkında "
 "'FETÖ tertibiydi' türü kesin anlatımlar, KESİNLEŞMİŞ mahkeme hükmü olmadıkça doğrulanamaz; zamanın geçmesi "
 "iddiayı kanıt yapmaz.\n"
-"(d) YÖNLENDİRİLMİŞ/İTİRAFÇI İFADE: Menfaat/baskı altında alınmış 'itirafçı' beyanlarıyla, cemaatin hiç "
-"yapmadığı şeyler suçlama olarak kurulabilir; tek taraflı itirafçı beyanı kanıt sayma.\n"
+"(d) MAHKEME / TANIK / İTİRAFÇI BEYANI ≠ GERÇEK: Bir beyanın mahkemede, ifadede veya iddianamede yer alması "
+"onu DOĞRU KILMAZ. Tanık, 'itirafçı', gizli tanık veya etkin pişmanlık beyanları; menfaat (ceza indirimi, "
+"tahliye), baskı, yönlendirme veya husumet nedeniyle GERÇEK DIŞI olabilir. Bu tür beyanlar, bağımsız ve somut "
+"delille (belge, kayıt, maddi bulgu) desteklenmedikçe KANIT değil, sınanması gereken birer İDDİADIR. Bir kişi/"
+"grup hakkında 'hiç yapmadığı' bir şey, böyle beyanlarla suçlamaya dönüştürülebilir. Haber bu beyanları kesin "
+"gerçek gibi sunuyorsa çarpıtma/iftira say; gerekçede 'beyan tek başına kanıt değildir, doğrulayıcı delil "
+"sunulmamış' diye belirt.\n"
 "(e) YAŞAYAN İSİMLER: Yaşayan kişileri ismen 'örgüt üyesi/bağlantılı/militan/kripto' göstermek, kesinleşmiş "
 "mahkûmiyet yoksa İFTİRA ve masumiyet karinesi ihlalidir. Her ismi AYRI iddia yap.\n"
 "(f) ANONİM İNSİNÜASYON: 'eşi bağlantılı olan isim', 'kripto isimler', 'bazı milletvekilleri' gibi muğlak "
@@ -140,7 +160,7 @@ CLAUDE_SYS = (
 "İNGİLİZCE: Uluslararası (AİHM) okuyucu için ayrıca İngilizce çeviri alanları doldur: baslik_en "
 "(başlığın İngilizcesi), ozet_en, genel_degerlendirme_en (aynı içeriğin akıcı İngilizcesi).\n"
 "SADECE şu şemada geçerli JSON döndür (markdown YOK):\n"
-'{"ozet":"3-5 cümle","genel_degerlendirme":"3-5 cümle, hukuki statü + AİHM/AYM dayanağı dahil",'
+'{"ozet":"4-6 cümle, bağlamlı paragraf","genel_degerlendirme":"GELİŞMİŞ ÇOK PARAGRAFLI, insani ve edebi; hukuki statü + atıf zinciri değerlendirmesi + çerçeve sorunları + (gerekiyorsa) AİHM/AYM dayanağı",'
 '"baslik_en":"English title","ozet_en":"English summary","genel_degerlendirme_en":"English assessment",'
 '"medya_kategori":"kara_propaganda|dezenformasyon|manipulatif|dogrulanmamis|kabul_edilebilir","kategori_gerekce":"1-2 cümle","halk_tabiri":"amiyane 2-4 kelime","araclastirma":"2-4 cümle veya boş",'
 '"haber_sorunu":["..."],"ihlal_edilen_haklar":["masumiyet","ifade",...],'
@@ -165,11 +185,11 @@ def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
     mec = ""
     if mecralar:
         mec = f"\n\nMECRALAR ({len(mecralar)} mecrada yer aldı): {', '.join(mecralar)}"
-    body = json.dumps({"model": model, "max_tokens": 8000, "temperature": 0.2, "system": CLAUDE_SYS,
+    body = json.dumps({"model": model, "max_tokens": 8000, "system": CLAUDE_SYS,
         "messages": [{"role": "user", "content": f"BAŞLIK: {baslik}\n\nHABER BAĞLAMI: {metin}{mec}\n\n=== ARAŞTIRMA BRİFİ (Gemini) ===\n{brief}"}]}).encode()
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
         headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
-    data = json.loads(urllib.request.urlopen(req, timeout=90).read())
+    data = json.loads(urllib.request.urlopen(req, timeout=300).read())  # Opus derin yazım uzun sürebilir
     t = data["content"][0]["text"]; m = re.search(r"\{.*\}", t, re.DOTALL)
     if not m: raise ValueError("Claude JSON döndürmedi")
     return json.loads(m.group(0))
@@ -186,11 +206,11 @@ PROOF_SYS = (
 def claude_proofread(analiz, key, model):
     """İkinci geçiş: yalnızca Türkçe dil düzeltme. Yapısal alanlar orijinalden korunur (güvenli merge)."""
     try:
-        body = json.dumps({"model": model, "max_tokens": 8000, "temperature": 0, "system": PROOF_SYS,
+        body = json.dumps({"model": model, "max_tokens": 8000, "system": PROOF_SYS,
             "messages": [{"role": "user", "content": "Şu raporun metinlerini düzelt:\n" + json.dumps(analiz, ensure_ascii=False)}]}).encode()
         req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
             headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
-        data = json.loads(urllib.request.urlopen(req, timeout=90).read())
+        data = json.loads(urllib.request.urlopen(req, timeout=180).read())
         t = data["content"][0]["text"]; m = re.search(r"\{.*\}", t, re.DOTALL)
         if not m: return analiz
         d = json.loads(m.group(0))
@@ -297,9 +317,10 @@ def process_one(baslik, metin, kaynaklar=None):
     hs_real = [s for s in (analiz.get("haber_sorunu") or []) if s in {"yalan_haber", "iftira", "toptan_suclama", "carpitma"}]
     if os.environ.get("HIBRIT_ONLY_PROBLEM", "1") != "0" and not hs_real:
         print("    ↷ Belirgin sorun yok (nötr haber) — kaydedilmedi"); return None
-    # Son geçiş: dil/redaksiyon düzeltmesi (yapısal alanlar korunur)
-    if os.environ.get("HIBRIT_PROOFREAD", "1") != "0":
-        analiz = claude_proofread(analiz, CKEY, CMODEL)
+    # Opsiyonel redaksiyon geçişi — VARSAYILAN KAPALI (Opus edebî üslubu zaten temiz üretir;
+    # ucuz model bu üslubu düzleştirebilir). Açmak için HIBRIT_PROOFREAD=1.
+    if os.environ.get("HIBRIT_PROOFREAD", "0") == "1":
+        analiz = claude_proofread(analiz, CKEY, PMODEL)
         print("    ✎ dil düzeltmesi yapıldı")
     if not kaynaklar:  # clustering yoksa Gemini'nin bulduğu kaynaklar
         kaynaklar = [{"kaynak_adi": t or "kaynak", "orijinal_url": resolve(u), "yayin_tarihi": ""} for t, u in sources[:8]]
