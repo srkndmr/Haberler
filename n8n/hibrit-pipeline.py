@@ -186,6 +186,18 @@ CLAUDE_SYS = (
 '"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: kriter + kanıt","dayanak_kaynak_url":"yalnızca tam http(s) URL; yoksa boş, kaynak adı YAZMA"}],'
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
+def _ilk_json(t):
+    """Metindeki İLK tam JSON nesnesini ayıkla; sonrasındaki fazla içeriği yok say (Extra data hatasına dayanıklı)."""
+    i = t.find("{")
+    if i < 0: raise ValueError("JSON nesnesi bulunamadı")
+    try:
+        obj, _ = json.JSONDecoder().raw_decode(t[i:])
+        return obj
+    except json.JSONDecodeError:
+        m = re.search(r"\{.*\}", t, re.DOTALL)   # son çare: greedy
+        if not m: raise ValueError("Geçerli JSON yok")
+        return json.loads(m.group(0))
+
 def resolve(u):
     """Yönlendirme linklerini (grounding redirect + Google News RSS) gerçek mecra URL'sine çöz."""
     u = (u or "").split(",")[0].strip()
@@ -208,9 +220,7 @@ def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
     req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
         headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
     data = json.loads(urllib.request.urlopen(req, timeout=300).read())  # Opus derin yazım uzun sürebilir
-    t = data["content"][0]["text"]; m = re.search(r"\{.*\}", t, re.DOTALL)
-    if not m: raise ValueError("Claude JSON döndürmedi")
-    return json.loads(m.group(0))
+    return _ilk_json(data["content"][0]["text"])
 
 PROOF_SYS = (
 "Sen titiz bir Türkçe düzeltmen/editörsün. Sana bir doğruluk denetimi raporunun JSON çıktısı verilecek. "
@@ -229,9 +239,7 @@ def claude_proofread(analiz, key, model):
         req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
             headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
         data = json.loads(urllib.request.urlopen(req, timeout=180).read())
-        t = data["content"][0]["text"]; m = re.search(r"\{.*\}", t, re.DOTALL)
-        if not m: return analiz
-        d = json.loads(m.group(0))
+        d = _ilk_json(data["content"][0]["text"])
     except Exception as e:
         print(f"    (dil düzeltmesi atlandı: {e})"); return analiz
     out = dict(analiz)
