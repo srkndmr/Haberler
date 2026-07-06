@@ -180,17 +180,17 @@ footer.wp-block-template-part{ display:none !important; }
 
 /* ---- Hero (ana sayfa) ---- */
 .home .wp-block-post-content{ padding-top:.5rem; }
-.hb-hero{ max-width:820px; margin:.5rem auto 1.5rem; text-align:center !important; padding:.5rem 1rem 0; }
-.hb-hero__mark{ display:flex; justify-content:center; margin-bottom:.7rem; }
-.hb-hero__mark svg{ width:40px; height:40px; color:var(--hb-accent); opacity:.9; }
+.hb-hero{ max-width:1120px; margin:.5rem auto 1.2rem; text-align:center !important; padding:.5rem 1rem 0; }
+.hb-hero__mark{ display:flex; justify-content:center; margin-bottom:.35rem; }
+.hb-hero__mark svg{ width:26px; height:26px; color:var(--hb-accent); opacity:.9; }
 .hb-footer__nav a .hb-ic{ width:1em; height:1em; margin-right:.3em; }
 .hb-hero > *, .hb-hero p, .hb-hero h1{ text-align:center !important; margin-left:auto; margin-right:auto; }
 .hb-hero__kicker{ font-size:.78rem; font-weight:700; letter-spacing:.14em;
   color:var(--hb-accent); margin:0 0 .6rem; }
-.hb-hero__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.02em; line-height:1.12;
-  font-size:clamp(2rem,5vw,3.1rem); color:var(--hb-ink); margin:.2rem auto .8rem; text-wrap:balance; }
-.hb-hero__sub{ font-size:1.12rem; color:var(--hb-muted); max-width:52ch; margin:0 auto 1.2rem;
-  text-align:center; text-wrap:balance; }
+.hb-hero__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.02em; line-height:1.14;
+  font-size:clamp(1.55rem,3.2vw,2.25rem); color:var(--hb-ink); margin:.15rem auto .6rem; text-wrap:balance; }
+.hb-hero__sub{ font-size:1rem; color:var(--hb-muted); max-width:78ch; margin:0 auto 1rem;
+  text-align:center; line-height:1.55; }
 .hb-hero__actions{ display:flex; gap:20px; justify-content:center; align-items:center; flex-wrap:wrap; margin-top:.6rem; }
 .hb-hero__cta{ display:inline-flex; align-items:center; gap:8px; background:var(--hb-accent); color:#fff!important;
   font-weight:600; font-size:1rem; padding:13px 28px; border-radius:10px;
@@ -218,7 +218,48 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-footer__legal{ color:var(--hb-muted); font-size:.82rem; border-top:1px solid var(--hb-line); padding-top:1rem; margin:0; }
 
 @media (max-width:640px){ body{ font-size:16px; } .entry-content,.wp-block-post-content{ padding-inline:6px; }
-  .hb-grid{ grid-template-columns:1fr; } }
+  .hb-grid{ grid-template-columns:1fr; } .hb-hero{ padding:1.3rem 1.1rem; } }
+
+/* ===== Klasik / profesyonel + etkileyici katman ===== */
+:root{ --hb-gold:#b78a3c; --hb-gold2:#caa14e; }
+
+/* Üstte ince, sade kural çizgisi (masthead rule) */
+.wp-site-blocks::before{ content:""; display:block; height:3px; background:var(--hb-accent); }
+
+/* Hero: koyu, ağırbaşlı band — parıltı yok, ince altın iç çerçeve */
+.hb-hero{ background:linear-gradient(160deg,#0e4453 0%,#0a3441 55%,#062028 100%);
+  color:#fff; border-radius:12px; padding:1.6rem 2rem 1.5rem; margin-top:.8rem;
+  box-shadow:0 18px 40px -26px rgba(6,32,40,.55); position:relative; overflow:hidden;
+  border:1px solid rgba(255,255,255,.06); }
+.hb-hero::before{ content:""; position:absolute; inset:0; pointer-events:none; border-radius:12px;
+  box-shadow:inset 0 0 0 1px rgba(202,161,78,.14); }
+.hb-hero > *{ position:relative; z-index:1; }
+.hb-hero__kicker{ color:var(--hb-gold2); letter-spacing:.2em; }
+.hb-hero__title{ color:#fff; font-weight:600; }
+.hb-hero__sub{ color:#bcd2d6; }
+.hb-hero__mark svg{ color:var(--hb-gold2); opacity:.95; }
+/* CTA: sade som pirinç-altın, parıltısız, keskin */
+.hb-hero__cta{ background:var(--hb-gold); color:#2a1e06!important; border-radius:8px; font-weight:600;
+  box-shadow:0 6px 16px -11px rgba(0,0,0,.55); }
+.hb-hero__cta:hover{ background:var(--hb-gold2); transform:translateY(-1px); box-shadow:0 9px 18px -11px rgba(0,0,0,.5); }
+.hb-hero__link{ color:#cfe0e3!important; }
+.hb-hero__link:hover{ border-bottom-color:var(--hb-gold2); }
+
+/* Bölüm başlığı: kısa, ince altın kural */
+.hb-section__title{ position:relative; padding-bottom:.6rem; }
+.hb-section__title::after{ content:""; display:block; width:44px; height:2px;
+  margin:.6rem auto 0; background:var(--hb-gold); }
+
+/* Kartlar: sade, ince üst kural belirir; ölçülü kalkış */
+.hb-kart{ position:relative; overflow:hidden; border-radius:12px; }
+.hb-kart::after{ content:""; position:absolute; left:0; top:0; width:100%; height:2px;
+  background:var(--hb-accent); transform:scaleX(0); transform-origin:left; transition:transform .2s ease; }
+.hb-kart:hover::after{ transform:scaleX(1); }
+.hb-kart:hover{ transform:translateY(-2px); box-shadow:0 12px 26px -20px rgba(16,24,40,.3); }
+
+/* Kutulara ölçülü derinlik */
+.hb-kategori{ box-shadow:0 8px 22px -18px rgba(16,24,40,.3); }
+.hb-verdict{ box-shadow:0 8px 22px -18px rgba(15,76,92,.3); }
 </style>
     <?php
 }, 99);
