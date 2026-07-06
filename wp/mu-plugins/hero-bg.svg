@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- Yumuşak diyagonal ışık huzmesi (hakikate düşen ışık) -->
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.015"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="18%" cy="12%" r="60%">
+      <stop offset="0%" stop-color="#2a6a7c" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#062028" stop-opacity="0"/>
+    </radialGradient>
+    <!-- İnce halftone / gazete dokusu -->
+    <pattern id="dots" width="14" height="14" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#9fd0d8" fill-opacity="0.05"/>
+    </pattern>
+    <!-- Kenarlarda yoğun, ortada boş kalsın diye maske -->
+    <radialGradient id="edgemask" cx="50%" cy="50%" r="62%">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="70%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="1"/>
+    </radialGradient>
+    <mask id="edges"><rect width="1600" height="900" fill="url(#edgemask)"/></mask>
+  </defs>
+
+  <!-- üstten sol köşe hafif ışık -->
+  <rect width="1600" height="900" fill="url(#glow)"/>
+  <!-- diyagonal huzme -->
+  <polygon points="0,0 620,0 240,900 0,900" fill="url(#beam)"/>
+  <!-- halftone yalnızca kenarlarda -->
+  <rect width="1600" height="900" fill="url(#dots)" mask="url(#edges)"/>
+
+  <!-- Sağda gölgeden beliren terazi (ince altın, çok düşük opaklık) -->
+  <g stroke="#caa14e" stroke-opacity="0.13" fill="none" stroke-width="3" stroke-linecap="round" transform="translate(1210,250)">
+    <circle cx="150" cy="0" r="7" stroke-opacity="0.16"/>
+    <line x1="150" y1="7" x2="150" y2="430"/>            <!-- direk -->
+    <line x1="60" y1="430" x2="240" y2="430"/>           <!-- taban -->
+    <line x1="110" y1="452" x2="190" y2="452" stroke-opacity="0.10"/>
+    <line x1="8" y1="40" x2="292" y2="40"/>              <!-- kefe kolu -->
+    <!-- sol kefe -->
+    <line x1="30" y1="40" x2="8" y2="150"/>
+    <line x1="30" y1="40" x2="52" y2="150"/>
+    <path d="M-6 150 A 36 26 0 0 0 66 150" stroke-opacity="0.12"/>
+    <!-- sağ kefe -->
+    <line x1="270" y1="40" x2="248" y2="150"/>
+    <line x1="270" y1="40" x2="292" y2="150"/>
+    <path d="M234 150 A 36 26 0 0 0 306 150" stroke-opacity="0.12"/>
+  </g>
+</svg>
