@@ -107,6 +107,24 @@ function haberler_dosya_render($content) {
     // ---- Tekil dosya ----
     $h  = '<div class="hb-dosya">';
 
+    // Künye satırı (dateline): kaynak · tarih — profesyonel gazete hissi
+    if (is_array($kay) && $kay) {
+        $mecra = trim((string) ($kay[0]['kaynak_adi'] ?? ''));
+        $tar   = trim((string) ($kay[0]['yayin_tarihi'] ?? ''));
+        // Tarihi Türkçe düzgün biçime çevir (ham RFC822/ISO -> "9 Aralık 2016")
+        if ($tar !== '' && ($ts = strtotime($tar)) !== false) {
+            $aylar = [1=>'Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+            $tar = (int) gmdate('j', $ts) . ' ' . $aylar[(int) gmdate('n', $ts)] . ' ' . gmdate('Y', $ts);
+        }
+        $ksay2 = count($kay);
+        if ($mecra) {
+            $h .= '<div class="hb-dateline"><span class="hb-dateline__src">' . esc_html($mecra) . '</span>'
+                . ($ksay2 > 1 ? ' <span class="hb-dateline__more">+' . ($ksay2 - 1) . ' mecra</span>' : '')
+                . ($tar ? ' <span class="hb-dateline__sep">·</span> <span class="hb-dateline__date">' . esc_html($tar) . '</span>' : '')
+                . '</div>';
+        }
+    }
+
     // EN ÜST: Uluslararası habercilik değerlendirmesi — medya kategorisi (ağırlık kademeli)
     if ($kategori && isset(HABERLER_KATEGORI[$kategori])) {
         $kv  = HABERLER_KATEGORI[$kategori];

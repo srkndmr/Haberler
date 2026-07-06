@@ -42,7 +42,10 @@ footer.wp-block-template-part{ display:none !important; }
 
 /* Başlıklar + okuma kolonu */
 .entry-title, .wp-block-post-title{ font-family:var(--serif); font-weight:700; letter-spacing:-.018em;
-  line-height:1.18; color:var(--hb-ink); font-size:clamp(1.9rem,4vw,2.7rem); max-width:880px; margin-inline:auto; }
+  line-height:1.16; color:var(--hb-ink); font-size:clamp(1.85rem,3.4vw,2.5rem); max-width:760px;
+  margin:0 auto .2rem; text-align:left; }
+/* Tekil yazı sayfası: içerik sütununu daralt, editoryal sola yaslı düzen */
+.single .wp-block-post-title, .single .entry-title{ padding:0 20px; }
 .entry-content, .wp-block-post-content{ font-size:1.12rem; color:var(--hb-text); }
 /* Anasayfada tema sayfa başlığını gizle (hero kendi başlığını taşır) */
 .home .wp-block-post-title, .home .entry-title{ display:none; }
@@ -50,7 +53,10 @@ footer.wp-block-template-part{ display:none !important; }
 .home main.wp-block-group{ margin-top:1.2rem !important; }
 .home main .wp-block-group.alignfull.has-global-padding{ padding-top:0 !important; }
 .entry-content h2, .wp-block-post-content h2{ font-family:var(--serif); color:var(--hb-ink); font-weight:600;
-  font-size:1.5rem; letter-spacing:-.01em; margin-top:2.1rem; padding-bottom:.3rem; border-bottom:2px solid var(--hb-soft); }
+  font-size:1.42rem; letter-spacing:-.01em; margin-top:2.4rem; padding-bottom:.45rem; position:relative;
+  border-bottom:1px solid var(--hb-line); }
+.entry-content h2::after, .wp-block-post-content h2::after{ content:""; position:absolute; left:0; bottom:-1px;
+  width:42px; height:2px; background:var(--hb-gold, #b78a3c); }
 .entry-content p{ margin:.9rem 0; }
 
 /* İkonlar (ince çizgi) */
@@ -58,7 +64,16 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-verdict__kicker .hb-ic{ width:1em; height:1em; margin-right:.35em; }
 
 /* ---- Dosya ---- */
-.hb-dosya{ max-width:740px; margin:2.2rem auto 0; }
+.hb-dosya{ max-width:760px; margin:.3rem auto 0; padding:0 20px; }
+/* Künye / dateline — başlık altı, ince kural çizgisiyle */
+.hb-dateline{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
+  font-size:.78rem; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
+  color:var(--hb-muted); padding-bottom:.9rem; margin-bottom:1.4rem;
+  border-bottom:1px solid var(--hb-line); }
+.hb-dateline__src{ color:var(--hb-accent); }
+.hb-dateline__more{ font-weight:600; letter-spacing:.04em; opacity:.8; }
+.hb-dateline__sep{ opacity:.5; }
+.hb-dateline__date{ font-weight:600; letter-spacing:.04em; }
 .hb-disclaimer{ font-size:.92rem; border-radius:12px; padding:12px 16px; margin:12px 0 18px; }
 .hb-disclaimer--top{ background:#fff8e6; border:1px solid #f3d27a; color:#6b5200; }
 .hb-disclaimer--bottom{ background:var(--hb-soft); border:1px solid var(--hb-line); color:var(--hb-muted); font-size:.88rem; }
