@@ -39,6 +39,14 @@ services:
       # YEREL test: Application Password'ler HTTP üzerinde yalnızca 'local' ortamda
       # çalışır. PHP getenv() bunu okur. PROD'da HTTPS olduğundan bu satıra GEREK YOK.
       WP_ENVIRONMENT_TYPE: local
+      # WP adresini isteğin geldiği host'a göre ayarla — hem localhost hem LAN IP çalışsın
+      # (başka cihazlardan http://<Mac-IP>:8091 ile erişim için). $$ = compose kaçışı.
+      WORDPRESS_CONFIG_EXTRA: |
+        if (!empty($$_SERVER['HTTP_HOST'])) {
+          $$__sch = (!empty($$_SERVER['HTTPS']) && $$_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+          define('WP_HOME', $$__sch . '://' . $$_SERVER['HTTP_HOST']);
+          define('WP_SITEURL', $$__sch . '://' . $$_SERVER['HTTP_HOST']);
+        }
     volumes:
       - wp_data:/var/www/html
       - ./mu-plugins:/var/www/html/wp-content/mu-plugins
