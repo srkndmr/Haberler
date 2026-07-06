@@ -7,10 +7,10 @@ wp/.app_password
 .env
 .env.local
 # Scheduler sırları + loglar
-n8n/scheduler/.env
-n8n/scheduler/*.log
-n8n/scheduler/seen-urls.txt
-n8n/haberler-pipeline.local.json
+pipeline/scheduler/.env
+pipeline/scheduler/*.log
+pipeline/scheduler/seen-urls.txt
+pipeline/haberler-pipeline.local.json
 __pycache__/
 *.pyc
 rag/

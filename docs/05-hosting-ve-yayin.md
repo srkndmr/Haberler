@@ -32,14 +32,14 @@ Satın aldıktan sonra şunları (güvenli şekilde) paylaşın:
 - [ ] DNS: alan adını hostinge yönlendirme + `www` + SSL doğrulama
 - [ ] VPS'e Docker + n8n kurulumu (`docs/01` Seçenek A)
 - [ ] n8n workflow + credential (WP + Anthropic) bağlama, Schedule aktif
-- [ ] **VEYA** scheduler ile günlük otomasyon (`n8n/scheduler/`) — WP_URL'yi canlı alan adına çevirerek
+- [ ] **VEYA** scheduler ile günlük otomasyon (`pipeline/scheduler/`) — WP_URL'yi canlı alan adına çevirerek
 - [ ] Düzeltme talebi formu (Fluent Forms) + KVKK metni
 - [ ] Üretim duman testi: bir taslak üret → otomatik-taslak → editör/hukuk akışı → yayın
 
 ## 4. Yayın öncesi ZORUNLU (kod değil, süreç) ✋
 
 - [ ] **Hukuk danışmanı** belirlendi; Künye'de gerçek isim; Metodoloji avukat onaylı
-- [ ] İzlenecek kaynak listesi + anahtar kelimeler son hali (`n8n/` config)
+- [ ] İzlenecek kaynak listesi + anahtar kelimeler son hali (`pipeline/` config)
 - [ ] KVKK aydınlatma + düzeltme süreci yazılı
 - [ ] İlk 5-10 dosya **elle** gözden geçirilip yayınlandı (otomasyona güvenmeden)
 

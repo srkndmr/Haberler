@@ -34,8 +34,8 @@ Yığın: **WordPress.org** (içerik + iş akışı) + **Python pipeline + launc
 | `acf/acf-dosya-alan-grubu.json` | ACF "Dosya" alan grubu — içe aktarılabilir JSON | 2 |
 | `docs/02-metodoloji-sayfasi.md` | Metodoloji sayfası taslak metni | 3 |
 | `docs/03-kunye-sayfasi.md` | Künye sayfası taslak metni | 3 |
-| `n8n/hibrit-pipeline.py` | **Ana pipeline:** Gemini (kanıt) → Claude (analiz, tool use + prompt caching) → WordPress taslak. `scheduler/` altındaki launchd ile günlük çalışır | 4 |
-| `n8n/scheduler/` | launchd plist'leri + çalıştırma scriptleri + `.env` (zamanlanmış otomasyon) | 4 |
+| `pipeline/hibrit-pipeline.py` | **Ana pipeline:** Gemini (kanıt) → Claude (analiz, tool use + prompt caching) → WordPress taslak. `scheduler/` altındaki launchd ile günlük çalışır | 4 |
+| `pipeline/scheduler/` | launchd plist'leri + çalıştırma scriptleri + `.env` (zamanlanmış otomasyon) | 4 |
 | `prompts/ai-analiz-sistem-promptu.md` | AI analiz adımı sistem promptu + katı JSON şeması | 5 |
 | `docs/04-rest-api-payload.md` | WordPress REST API örnek gönderim payload'u + alan eşleme | 6 |
 | `wp/` | **Çalışan inşa:** Docker test ortamı + WP-CLI setup + drop-in mu-plugins (roller, durumlar, veri, hukuk kapısı). 5/5 test geçti. Bkz. `wp/README.md` | — |
@@ -56,7 +56,7 @@ otomatik aktif olur. Detay ve doğrulama testleri: `wp/README.md`.
 1. `docs/00-kurulum-rehberi.md` → WordPress'i ayağa kaldır, rolleri/durumları/ACF'yi kur.
 2. `acf/acf-dosya-alan-grubu.json` → ACF'ye içe aktar.
 3. `docs/02-metodoloji-sayfasi.md` + `docs/03-kunye-sayfasi.md` → sayfaları taslak olarak gir.
-4. `n8n/hibrit-pipeline.py` + `n8n/scheduler/` → API anahtarlarını `.env`'e gir, pipeline'ı çalıştır / launchd ile zamanla.
+4. `pipeline/hibrit-pipeline.py` + `pipeline/scheduler/` → API anahtarlarını `.env`'e gir, pipeline'ı çalıştır / launchd ile zamanla.
 5. `prompts/ai-analiz-sistem-promptu.md` → sistem promptu referansı (pipeline içindeki `CLAUDE_SYS` ile eşleşir).
 6. `docs/04-rest-api-payload.md` → REST gönderimini test et.
 

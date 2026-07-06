@@ -6,7 +6,7 @@ RSS son ~100 haberi verdiğinden, ay genelini taramak için Google News RSS ARAM
 Akış: Google News arama -> ay filtresi -> dedup -> Claude analiz -> WP otomatik-taslak.
 
 Kullanım:
-  cd n8n/scheduler && . ./.env && cd .. && \
+  cd pipeline/scheduler && . ./.env && cd .. && \
   AY=Jun YIL=2026 LIMIT=10 ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY WP_APP_PASS=$WP_APP_PASS \
   python3 aylik-tarama.py
 """

@@ -15,7 +15,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/sh</string>
-        <string>/Users/apple/Haberler/n8n/scheduler/run-incele.sh</string>
+        <string>/Users/apple/Haberler/pipeline/scheduler/run-incele.sh</string>
     </array>
 
     <key>RunAtLoad</key>
@@ -24,8 +24,8 @@
     <true/>
 
     <key>StandardOutPath</key>
-    <string>/Users/apple/Haberler/n8n/scheduler/incele.launchd.out.log</string>
+    <string>/Users/apple/Haberler/pipeline/scheduler/incele.launchd.out.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/apple/Haberler/n8n/scheduler/incele.launchd.err.log</string>
+    <string>/Users/apple/Haberler/pipeline/scheduler/incele.launchd.err.log</string>
 </dict>
 </plist>

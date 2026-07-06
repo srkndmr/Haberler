@@ -1,6 +1,6 @@
 # Zamanlanmış Otomasyon (günlük pipeline)
 
-Kanıtlanmış `n8n/canli-pipeline-test.py` akışını **her gün otomatik** çalıştırır:
+Kanıtlanmış `pipeline/canli-pipeline-test.py` akışını **her gün otomatik** çalıştırır:
 RSS çek → FETÖ filtresi → Claude analiz → WordPress **otomatik-taslak**.
 
 > Bu, n8n grafiğinin tam UI kurulumuna alternatif, **hemen çalışan** yoldur.
@@ -11,7 +11,7 @@ RSS çek → FETÖ filtresi → Claude analiz → WordPress **otomatik-taslak**.
 
 1. **Sırları gir:**
    ```bash
-   cd /Users/apple/Haberler/n8n/scheduler
+   cd /Users/apple/Haberler/pipeline/scheduler
    cp .env.example .env
    # .env'i düzenle: YENİ Anthropic anahtarı + pipeline-bot Application Password
    ```
@@ -44,7 +44,7 @@ cd /Users/apple/Haberler/rag && pip install -r requirements.txt --break-system-p
 python dogrula_kanallar.py          # YouTube handle'larını doğrula, gerekirse düzelt
 
 # Elle test
-cd /Users/apple/Haberler/n8n/scheduler && sh run-rag.sh && tail -n 30 rag.log
+cd /Users/apple/Haberler/pipeline/scheduler && sh run-rag.sh && tail -n 30 rag.log
 
 # Günlük zamanla (05:30)
 cp com.haberler.rag.plist ~/Library/LaunchAgents/

@@ -16,7 +16,7 @@
     <key>ProgramArguments</key>
     <array>
         <string>/bin/sh</string>
-        <string>/Users/apple/Haberler/n8n/scheduler/run-daily.sh</string>
+        <string>/Users/apple/Haberler/pipeline/scheduler/run-daily.sh</string>
     </array>
 
     <key>StartCalendarInterval</key>
@@ -26,9 +26,9 @@
     </dict>
 
     <key>StandardOutPath</key>
-    <string>/Users/apple/Haberler/n8n/scheduler/launchd.out.log</string>
+    <string>/Users/apple/Haberler/pipeline/scheduler/launchd.out.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/apple/Haberler/n8n/scheduler/launchd.err.log</string>
+    <string>/Users/apple/Haberler/pipeline/scheduler/launchd.err.log</string>
 
     <key>RunAtLoad</key>
     <false/>
