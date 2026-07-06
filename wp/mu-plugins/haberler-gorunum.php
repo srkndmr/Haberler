@@ -323,9 +323,10 @@ function haberler_dosya_render($content) {
 
     // İlgili Dosyalar — aynı temada son 3 dosya
     $ilgili = get_posts([
-        'post_type' => 'post', 'post_status' => ['otomatik-taslak', 'hukuk-incelemesi', 'publish'],
+        'post_type' => 'post', 'post_status' => 'publish',
         'posts_per_page' => 3, 'post__not_in' => [$id], 'orderby' => 'date', 'order' => 'DESC',
         'ignore_sticky_posts' => true,
+        'meta_query' => [['key' => 'haberler_ozet', 'compare' => 'EXISTS']],
     ]);
     if ($ilgili) {
         $h .= '<h2>' . haberler_ic('doc') . 'İlgili Dosyalar</h2><div class="hb-ilgili">';
