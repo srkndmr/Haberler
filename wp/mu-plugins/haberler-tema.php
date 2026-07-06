@@ -81,8 +81,11 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-dateline__date{ font-weight:600; letter-spacing:.04em; }
 
 /* Masthead: koyu başlık bandı (kurumsal üst kimlik) */
-.hb-masthead{ background:linear-gradient(160deg,#0e2a33 0%,#08222b 55%,#05161c 100%);
-  border-radius:14px; padding:1.5rem 1.8rem 1.3rem; margin:0 0 1.4rem;
+.hb-masthead{ background:
+    linear-gradient(90deg, rgba(8,34,43,.96) 0%, rgba(8,34,43,.72) 48%, rgba(8,34,43,.30) 100%),
+    url("/wp-content/mu-plugins/masthead-bg.png") right center/cover no-repeat,
+    linear-gradient(160deg,#0e2a33 0%,#08222b 55%,#05161c 100%);
+  border-radius:14px; padding:1.5rem 1.8rem 1.3rem; margin:0 0 1.4rem; overflow:hidden;
   box-shadow:0 16px 38px -26px rgba(5,22,28,.6); border:1px solid rgba(255,255,255,.05); }
 .hb-masthead__eyebrow{ font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.16em;
   text-transform:uppercase; color:var(--hb-gold,#c9a24b); margin-bottom:.55rem; }
