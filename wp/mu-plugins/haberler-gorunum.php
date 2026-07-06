@@ -107,23 +107,30 @@ function haberler_dosya_render($content) {
     // ---- Tekil dosya ----
     $h  = '<div class="hb-dosya">';
 
-    // Künye satırı (dateline): kaynak · tarih — profesyonel gazete hissi
+    // Künye (dateline) metnini hazırla — masthead içine konacak
+    $dateline_html = '';
     if (is_array($kay) && $kay) {
         $mecra = trim((string) ($kay[0]['kaynak_adi'] ?? ''));
         $tar   = trim((string) ($kay[0]['yayin_tarihi'] ?? ''));
-        // Tarihi Türkçe düzgün biçime çevir (ham RFC822/ISO -> "9 Aralık 2016")
         if ($tar !== '' && ($ts = strtotime($tar)) !== false) {
             $aylar = [1=>'Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
             $tar = (int) gmdate('j', $ts) . ' ' . $aylar[(int) gmdate('n', $ts)] . ' ' . gmdate('Y', $ts);
         }
         $ksay2 = count($kay);
         if ($mecra) {
-            $h .= '<div class="hb-dateline"><span class="hb-dateline__src">' . esc_html($mecra) . '</span>'
+            $dateline_html = '<div class="hb-dateline"><span class="hb-dateline__src">' . esc_html($mecra) . '</span>'
                 . ($ksay2 > 1 ? ' <span class="hb-dateline__more">+' . ($ksay2 - 1) . ' mecra</span>' : '')
                 . ($tar ? ' <span class="hb-dateline__sep">·</span> <span class="hb-dateline__date">' . esc_html($tar) . '</span>' : '')
                 . '</div>';
         }
     }
+
+    // MASTHEAD: koyu başlık bandı (eyebrow + başlık + künye) — her dosyaya kurumsal üst kimlik
+    $h .= '<header class="hb-masthead">'
+        . '<div class="hb-masthead__eyebrow">DOSYA · DOĞRULUK DENETİMİ</div>'
+        . '<h1 class="hb-masthead__title">' . esc_html(get_the_title($id)) . '</h1>'
+        . $dateline_html
+        . '</header>';
 
     // Paylaş / Yazdır aksiyon çubuğu
     $paylas_url = esc_url(get_permalink($id));

@@ -44,8 +44,8 @@ footer.wp-block-template-part{ display:none !important; }
 .entry-title, .wp-block-post-title{ font-family:var(--serif); font-weight:700; letter-spacing:-.018em;
   line-height:1.16; color:var(--hb-ink); font-size:clamp(1.85rem,3.4vw,2.5rem); max-width:760px;
   margin:0 auto .2rem; text-align:left; }
-/* Tekil yazı sayfası: içerik sütununu daralt, editoryal sola yaslı düzen */
-.single .wp-block-post-title, .single .entry-title{ padding:0 20px; }
+/* Tekil dosya: tema başlığını gizle — kendi masthead kartımızı basıyoruz */
+.single .wp-block-post-title, .single .entry-title{ display:none !important; }
 /* "Written by pipeline-bot in Uncategorized" byline'ını gizle — künye satırımız yeterli.
    DİKKAT: yalnızca byline'ın DOĞRUDAN grubunu hedefle (> ile); geniş :has() içerik
    sarmalayıcısını da gizleyip sayfayı boşaltıyordu. */
@@ -80,10 +80,17 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-dateline__sep{ opacity:.5; }
 .hb-dateline__date{ font-weight:600; letter-spacing:.04em; }
 
-/* Masthead: başlık üstü eyebrow (kurumsal gazete hissi) */
-.single .wp-block-post-title::before{ content:"DOSYA · DOĞRULUK DENETİMİ"; display:block;
-  font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.16em;
-  color:var(--hb-gold,#b78a3c); margin-bottom:.5rem; }
+/* Masthead: koyu başlık bandı (kurumsal üst kimlik) */
+.hb-masthead{ background:linear-gradient(160deg,#0e2a33 0%,#08222b 55%,#05161c 100%);
+  border-radius:14px; padding:1.5rem 1.8rem 1.3rem; margin:0 0 1.4rem;
+  box-shadow:0 16px 38px -26px rgba(5,22,28,.6); border:1px solid rgba(255,255,255,.05); }
+.hb-masthead__eyebrow{ font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--hb-gold,#c9a24b); margin-bottom:.55rem; }
+.hb-masthead__title{ font-family:var(--serif); font-weight:700; letter-spacing:-.018em; line-height:1.16;
+  font-size:clamp(1.7rem,3.2vw,2.35rem); color:#fff; margin:0; }
+.hb-masthead .hb-dateline{ margin:.9rem 0 0; padding:0; border:0; color:#a9c2c8; }
+.hb-masthead .hb-dateline__src{ color:var(--hb-gold,#c9a24b); }
+.hb-masthead .hb-dateline__date, .hb-masthead .hb-dateline__more{ color:#cfe0e3; }
 
 /* Paylaş / Yazdır aksiyon çubuğu */
 .hb-actions{ display:flex; gap:10px; margin:0 0 1.3rem; }
