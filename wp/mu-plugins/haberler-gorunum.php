@@ -125,6 +125,22 @@ function haberler_dosya_render($content) {
         }
     }
 
+    // Paylaş / Yazdır aksiyon çubuğu
+    $paylas_url = esc_url(get_permalink($id));
+    $h .= '<div class="hb-actions">'
+        . '<button type="button" class="hb-act" onclick="(navigator.share?navigator.share({title:document.title,url:location.href}):navigator.clipboard.writeText(location.href).then(function(){this.textContent=\'✓ Kopyalandı\'}.bind(this)))">'
+        . haberler_ic('link') . 'Paylaş</button>'
+        . '<button type="button" class="hb-act" onclick="window.print()">' . haberler_ic('doc') . 'Yazdır</button>'
+        . '</div>';
+
+    // Tespit edilen sorun etiketleri (kategori kutusuna gömülecek)
+    $sorun_etiketler = [];
+    if (is_array($sorun)) {
+        foreach ($sorun as $s) {
+            if ($s && $s !== 'sorun_yok' && isset(HABERLER_SORUN_ETIKET[$s])) $sorun_etiketler[] = HABERLER_SORUN_ETIKET[$s];
+        }
+    }
+
     // EN ÜST: Uluslararası habercilik değerlendirmesi — medya kategorisi (ağırlık kademeli)
     if ($kategori && isset(HABERLER_KATEGORI[$kategori])) {
         $kv  = HABERLER_KATEGORI[$kategori];
@@ -162,25 +178,16 @@ function haberler_dosya_render($content) {
             $h .= '<div class="hb-kategori__halk">Halk diliyle, en hafif tabirle: '
                 . '<strong>“' . esc_html($halk) . '”</strong></div>';
         }
+        if ($sorun_etiketler) {
+            $h .= '<div class="hb-kategori__sorun"><span class="hb-kategori__sorunlbl">Tespit edilen sorun:</span> '
+                . esc_html(implode(' · ', $sorun_etiketler)) . '</div>';
+        }
         $h .= '</div>';
+    } elseif ($sorun_etiketler) {
+        // Kategori yoksa sorun bandını tek başına göster (yedek)
+        $h .= '<div class="hb-sorun"><span class="hb-sorun__ic">⚠</span> Bu haberde tespit edilen sorun: '
+            . '<strong>' . esc_html(implode(' · ', $sorun_etiketler)) . '</strong></div>';
     }
-
-    // Tespit edilen haber sorunu (varsa) — en üstte belirgin banner
-    if (is_array($sorun)) {
-        $etiketler = [];
-        foreach ($sorun as $s) {
-            if ($s && $s !== 'sorun_yok' && isset(HABERLER_SORUN_ETIKET[$s])) $etiketler[] = HABERLER_SORUN_ETIKET[$s];
-        }
-        if ($etiketler) {
-            $h .= '<div class="hb-sorun"><span class="hb-sorun__ic">⚠</span> Bu haberde tespit edilen sorun: '
-                . '<strong>' . esc_html(implode(' · ', $etiketler)) . '</strong></div>';
-        }
-    }
-
-    $h .= '<p class="hb-disclaimer hb-disclaimer--top"><strong>Not:</strong> Bu dosya, kamuya açık '
-        . 'haberlerde öne sürülen iddiaların bağımsız bir değerlendirmesidir. Aktarılan iddialar ilgili '
-        . 'kaynaklara aittir; bir kişinin suçlu olup olmadığına ilişkin nihai takdir yalnızca yargı '
-        . 'mercilerine aittir. Değerlendirmelerimiz kesin hüküm niteliği taşımaz.</p>';
 
     // Değerlendirme kutusu (görsel anchor)
     if (is_array($idd) && $idd) {
@@ -247,10 +254,12 @@ function haberler_dosya_render($content) {
         }
         $h .= '</div>';
 
+        $ino = 0;
         foreach ($idd as $x) {
+            $ino++;
             $s = $x['siniflandirma'] ?? 'dogrulanamaz';
             $h .= '<div class="hb-iddia hb-iddia--' . esc_attr($s) . '">';
-            $h .= haberler_chip($s);
+            $h .= '<div class="hb-iddia__ust"><span class="hb-iddia__no">' . $ino . '</span>' . haberler_chip($s) . '</div>';
             $h .= '<p class="hb-iddia__metin">' . esc_html($x['iddia_metni'] ?? '') . '</p>';
             if (!empty($x['gerekce']))
                 $h .= '<p class="hb-iddia__satir"><b>Gerekçe:</b> ' . esc_html($x['gerekce']) . '</p>';
@@ -279,6 +288,7 @@ function haberler_dosya_render($content) {
             $h  .= '<li><strong>' . esc_html($ad) . '</strong>' . $tar;
             if ($url) $h .= ' · <a href="' . esc_url($url) . '" target="_blank" rel="noopener">' . haberler_ic('link') . 'orijinal</a>';
             if (!empty($k['arsiv_url'])) $h .= ' · <a href="' . esc_url($k['arsiv_url']) . '" target="_blank" rel="noopener">arşiv</a>';
+            elseif ($url && preg_match('#^https?://#i', $url)) $h .= ' · <a href="' . esc_url('https://web.archive.org/web/*/' . $url) . '" target="_blank" rel="noopener">arşiv</a>';
             $h .= '</li>';
         }
         $h .= '</ul>';
@@ -310,6 +320,25 @@ function haberler_dosya_render($content) {
         . 'doğruluk denetimi faaliyetidir; bir editör incelemesinden geçmiştir ve hukuki görüş niteliği '
         . 'taşımaz. Bir hata olduğunu düşünüyorsanız İletişim / Düzeltme Talebi sayfasından bildirebilirsiniz; '
         . 'her başvuru insan eliyle değerlendirilir.</p>';
+
+    // İlgili Dosyalar — aynı temada son 3 dosya
+    $ilgili = get_posts([
+        'post_type' => 'post', 'post_status' => ['otomatik-taslak', 'hukuk-incelemesi', 'publish'],
+        'posts_per_page' => 3, 'post__not_in' => [$id], 'orderby' => 'date', 'order' => 'DESC',
+        'ignore_sticky_posts' => true,
+    ]);
+    if ($ilgili) {
+        $h .= '<h2>' . haberler_ic('doc') . 'İlgili Dosyalar</h2><div class="hb-ilgili">';
+        foreach ($ilgili as $ip) {
+            $ikat  = get_post_meta($ip->ID, 'haberler_medya_kategori', true);
+            $iklbl = isset(HABERLER_KATEGORI[$ikat]) ? HABERLER_KATEGORI[$ikat]['tr'] : '';
+            $isev  = isset(HABERLER_KATEGORI[$ikat]) ? (int) HABERLER_KATEGORI[$ikat]['sev'] : 1;
+            $h .= '<a class="hb-ilgili__k" href="' . esc_url(get_permalink($ip->ID)) . '">'
+                . ($iklbl ? '<span class="hb-kat-rozet hb-kat-rozet--sev' . $isev . '">' . esc_html($iklbl) . '</span>' : '')
+                . '<span class="hb-ilgili__baslik">' . esc_html(get_the_title($ip->ID)) . '</span></a>';
+        }
+        $h .= '</div>';
+    }
     $h .= '</div>';
     return $content . $h;
 }

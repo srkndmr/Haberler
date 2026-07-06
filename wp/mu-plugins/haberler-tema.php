@@ -77,6 +77,37 @@ footer.wp-block-template-part{ display:none !important; }
 .hb-dateline__more{ font-weight:600; letter-spacing:.04em; opacity:.8; }
 .hb-dateline__sep{ opacity:.5; }
 .hb-dateline__date{ font-weight:600; letter-spacing:.04em; }
+
+/* Masthead: başlık üstü eyebrow (kurumsal gazete hissi) */
+.single .wp-block-post-title::before{ content:"DOSYA · DOĞRULUK DENETİMİ"; display:block;
+  font-family:var(--sans); font-size:.72rem; font-weight:700; letter-spacing:.16em;
+  color:var(--hb-gold,#b78a3c); margin-bottom:.5rem; }
+
+/* Paylaş / Yazdır aksiyon çubuğu */
+.hb-actions{ display:flex; gap:10px; margin:0 0 1.3rem; }
+.hb-act{ display:inline-flex; align-items:center; gap:6px; font:inherit; font-size:.86rem; font-weight:600;
+  cursor:pointer; background:#fff; color:var(--hb-accent); border:1px solid var(--hb-line);
+  border-radius:9px; padding:7px 14px; transition:border-color .15s, background .15s; }
+.hb-act:hover{ border-color:var(--hb-accent); background:var(--hb-soft); }
+.hb-act .hb-ic{ width:1em; height:1em; margin-right:0; }
+
+/* Kategori kutusuna gömülü sorun satırı */
+.hb-kategori__sorun{ margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,.14);
+  font-size:.95rem; }
+.hb-kategori__sorunlbl{ font-weight:700; opacity:.85; }
+.hb-kategori--sev3 .hb-kategori__sorun,.hb-kategori--sev2 .hb-kategori__sorun,.hb-kategori--sev1 .hb-kategori__sorun{ border-top-color:rgba(0,0,0,.1); }
+
+/* İddia kartı: numara rozeti */
+.hb-iddia__ust{ display:flex; align-items:center; gap:10px; margin-bottom:.2rem; }
+.hb-iddia__no{ flex:0 0 auto; width:26px; height:26px; border-radius:50%; background:var(--hb-ink);
+  color:#fff; font-size:.85rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+/* İlgili Dosyalar */
+.hb-ilgili{ display:grid; gap:10px; margin:.6rem 0; }
+.hb-ilgili__k{ display:flex; align-items:center; gap:12px; text-decoration:none; background:#fff;
+  border:1px solid var(--hb-line); border-radius:12px; padding:12px 16px; transition:border-color .15s, box-shadow .15s; }
+.hb-ilgili__k:hover{ border-color:var(--hb-accent); box-shadow:0 6px 16px -12px rgba(15,76,92,.4); }
+.hb-ilgili__baslik{ font-family:var(--serif); font-weight:600; color:var(--hb-ink); line-height:1.3; }
 .hb-disclaimer{ font-size:.92rem; border-radius:12px; padding:12px 16px; margin:12px 0 18px; }
 .hb-disclaimer--top{ background:#fff8e6; border:1px solid #f3d27a; color:#6b5200; }
 .hb-disclaimer--bottom{ background:var(--hb-soft); border:1px solid var(--hb-line); color:var(--hb-muted); font-size:.88rem; }
