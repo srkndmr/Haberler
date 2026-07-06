@@ -46,9 +46,11 @@ footer.wp-block-template-part{ display:none !important; }
   margin:0 auto .2rem; text-align:left; }
 /* Tekil yazı sayfası: içerik sütununu daralt, editoryal sola yaslı düzen */
 .single .wp-block-post-title, .single .entry-title{ padding:0 20px; }
-/* "Written by pipeline-bot in Uncategorized" byline'ını gizle — künye satırımız yeterli */
-.single .wp-block-group:has(.wp-block-post-author-name){ display:none !important; }
-.single .wp-block-post-author, .single .wp-block-post-author-name, .single .wp-block-post-terms{ display:none !important; }
+/* "Written by pipeline-bot in Uncategorized" byline'ını gizle — künye satırımız yeterli.
+   DİKKAT: yalnızca byline'ın DOĞRUDAN grubunu hedefle (> ile); geniş :has() içerik
+   sarmalayıcısını da gizleyip sayfayı boşaltıyordu. */
+.single .wp-block-group:has(> .wp-block-post-author-name){ display:none !important; }
+.single .wp-block-post-author-name, .single .wp-block-post-terms{ display:none !important; }
 .entry-content, .wp-block-post-content{ font-size:1.12rem; color:var(--hb-text); }
 /* Anasayfada tema sayfa başlığını gizle (hero kendi başlığını taşır) */
 .home .wp-block-post-title, .home .entry-title{ display:none; }
