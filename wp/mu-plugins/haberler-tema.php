@@ -25,7 +25,7 @@ add_action('wp_head', function () {
   --c-dogru:#1a7f37; --c-kismen:#9a6700; --c-yanlis:#cf222e; --c-dogrulanamaz:#57606a; --c-mesnetsiz:#c2410c; --c-gorus:#7c3aed;
   --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px -16px rgba(16,24,40,.18);
 }
-body{ color:var(--hb-text); background:var(--hb-bg); font-family:var(--sans);
+body{ color:var(--hb-text); background:var(--hb-bg) url("/wp-content/mu-plugins/body-bg.png") center top/cover fixed no-repeat; font-family:var(--sans);
   line-height:1.7; -webkit-font-smoothing:antialiased; font-size:17px; }
 a{ color:var(--hb-accent); text-underline-offset:2px; } a:hover{ color:var(--hb-accent2); }
 
