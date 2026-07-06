@@ -13,3 +13,5 @@ n8n/scheduler/seen-urls.txt
 n8n/haberler-pipeline.local.json
 __pycache__/
 *.pyc
+rag/
+.rag.lock

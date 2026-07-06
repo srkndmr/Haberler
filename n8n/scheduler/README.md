@@ -30,6 +30,28 @@ RSS çek → FETÖ filtresi → Claude analiz → WordPress **otomatik-taslak**.
 launchctl unload ~/Library/LaunchAgents/com.haberler.pipeline.plist
 ```
 
+## RAG referans arşivi (09:30 — hibrit'ten önce)
+
+`../../rag/` altındaki kaynak arşivini her gün güncelleyip (makale + YouTube transkripti
++ embedding) hibrit pipeline'a taze referans sağlar. Hibrit run'ı `HIBRIT_RAG=1` ile bu
+arşivi otomatik kullanır (arşiv boşsa güvenle atlar).
+
+Günlük sıra: **09:30 RAG güncelle → 10:30 hibrit analiz.**
+
+```bash
+# Bağımlılıklar (bir kez)
+cd /Users/apple/Haberler/rag && pip install -r requirements.txt --break-system-packages
+python dogrula_kanallar.py          # YouTube handle'larını doğrula, gerekirse düzelt
+
+# Elle test
+cd /Users/apple/Haberler/n8n/scheduler && sh run-rag.sh && tail -n 30 rag.log
+
+# Günlük zamanla (05:30)
+cp com.haberler.rag.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.haberler.rag.plist
+# Durdurma: launchctl unload ~/Library/LaunchAgents/com.haberler.rag.plist
+```
+
 ## Notlar
 - `.env` **git'e girmez** (gitignore). Anahtarı asla repoya yazmayın.
 - `LIMIT` ile günlük işlenecek dosya sayısını sınırlayın (maliyet kontrolü).

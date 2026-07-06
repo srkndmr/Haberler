@@ -15,7 +15,8 @@ LOG="$DIR/hibrit.log"
 echo "===== $(date '+%Y-%m-%d %H:%M:%S') hibrit başladı =====" >> "$LOG"
 
 # Kümeleme sonrası zaten ~4-5 farklı haber; tavan 8, küme arası 25s (kota/RPM dostu)
-HIBRIT_LIMIT="${HIBRIT_LIMIT:-8}" HIBRIT_SLEEP="${HIBRIT_SLEEP:-25}" \
+# HIBRIT_RAG=1: RAG referans arşivini kullan (DB boşsa güvenle atlar). Kapatmak için .env'e HIBRIT_RAG=0.
+HIBRIT_LIMIT="${HIBRIT_LIMIT:-8}" HIBRIT_SLEEP="${HIBRIT_SLEEP:-25}" HIBRIT_RAG="${HIBRIT_RAG:-1}" \
   python3 "$DIR/../hibrit-pipeline.py" >> "$LOG" 2>&1
 
 echo "===== $(date '+%Y-%m-%d %H:%M:%S') bitti =====" >> "$LOG"

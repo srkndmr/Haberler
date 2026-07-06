@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  macOS launchd: RAG arşivini her gün 09:30'da günceller (hibrit'ten önce).
+  Kurulum:
+    cp com.haberler.rag.plist ~/Library/LaunchAgents/
+    launchctl load ~/Library/LaunchAgents/com.haberler.rag.plist
+  Durdurma:
+    launchctl unload ~/Library/LaunchAgents/com.haberler.rag.plist
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.haberler.rag</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/sh</string>
+        <string>/Users/apple/Haberler/n8n/scheduler/run-rag.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>9</integer>
+        <key>Minute</key><integer>30</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/apple/Haberler/n8n/scheduler/rag.launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/apple/Haberler/n8n/scheduler/rag.launchd.err.log</string>
+
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>
