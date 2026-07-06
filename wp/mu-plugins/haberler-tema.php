@@ -227,7 +227,9 @@ footer.wp-block-template-part{ display:none !important; }
 .wp-site-blocks::before{ content:""; display:block; height:3px; background:var(--hb-accent); }
 
 /* Hero: koyu, ağırbaşlı band — parıltı yok, ince altın iç çerçeve */
-.hb-hero{ background:url("/wp-content/mu-plugins/hero-bg.svg") center/cover no-repeat,
+.hb-hero{ background:
+  linear-gradient(180deg, rgba(6,32,40,.42), rgba(6,32,40,.60)),
+  url("/wp-content/mu-plugins/hero-bg.png") center 32%/cover no-repeat,
   linear-gradient(160deg,#0e4453 0%,#0a3441 55%,#062028 100%);
   color:#fff; border-radius:12px; padding:1.6rem 2rem 1.5rem; margin-top:.8rem;
   box-shadow:0 18px 40px -26px rgba(6,32,40,.55); position:relative; overflow:hidden;
