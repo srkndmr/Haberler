@@ -5,6 +5,15 @@
  */
 if (!defined('ABSPATH')) exit;
 
+// Ön sayfa ve dosya sayfaları dinamik — tarayıcı stale HTML tutmasın (her seferinde taze)
+add_action('send_headers', function () {
+    if (is_admin()) return;
+    if (is_front_page() || is_home() || is_singular('post')) {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+    }
+});
+
 add_shortcode('haberler_son_dosyalar', function ($atts) {
     $a = shortcode_atts(['limit' => 9, 'baslik' => ''], $atts);
     $q = new WP_Query([
