@@ -70,6 +70,12 @@ footer.wp-block-template-part{ display:none !important; }
 
 /* ---- Dosya ---- */
 .hb-dosya{ max-width:760px; margin:.3rem auto 0; padding:0 20px; }
+/* Statik sayfa (Metodoloji/Künye vb.) içerik sütunu */
+.hb-sayfa{ max-width:760px; margin:1.4rem auto 0; padding:0 20px; }
+.hb-sayfa__ust{ font-size:1.12rem; color:var(--hb-ink); line-height:1.6; border-left:3px solid var(--hb-gold,#b78a3c);
+  padding-left:16px; margin:0 0 .6rem; }
+.hb-sayfa ul{ margin:.6rem 0; padding-left:1.15em; }
+.hb-sayfa li{ margin:.5rem 0; line-height:1.6; }
 /* Künye / dateline — başlık altı, ince kural çizgisiyle */
 .hb-dateline{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;
   font-size:.78rem; font-weight:700; letter-spacing:.11em; text-transform:uppercase;
