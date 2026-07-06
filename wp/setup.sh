@@ -53,7 +53,7 @@ $WP user get hukukcu >/dev/null 2>&1 || \
   $WP user create hukukcu hukukcu@example.com --role=hukuk_danismani --user_pass="hukukcu-parola" >/dev/null
 
 echo "==> Sayfalar..."
-for P in "Günlük İzleme Akışı" "Arşiv" "Metodoloji" "Künye" "İletişim / Düzeltme Talebi"; do
+for P in "Ana Sayfa" "Arşiv" "Metodoloji" "Künye" "İletişim"; do
   EXIST=$($WP post list --post_type=page --field=post_title --format=csv 2>/dev/null | grep -Fx "$P" || true)
   if [ -z "$EXIST" ]; then
     $WP post create --post_type=page --post_status=publish \
