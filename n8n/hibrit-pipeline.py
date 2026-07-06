@@ -9,7 +9,7 @@ HİBRİT pipeline:
 Kullanım:
   cd n8n && . ./scheduler/.env && python3 hibrit-pipeline.py "BAŞLIK" ["bağlam"]
 """
-import os, re, sys, json, time, base64, importlib.util, urllib.request, urllib.error
+import os, re, sys, json, time, base64, importlib.util, urllib.request, urllib.error, urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 def _load(n, f):
@@ -194,6 +194,75 @@ CLAUDE_SYS = (
 '"iddialar":[{"iddia_metni":"","siniflandirma":"","gerekce":"2-3 cümle: kriter + kanıt","dayanak_kaynak_url":"yalnızca tam http(s) URL; yoksa boş, kaynak adı YAZMA"}],'
 '"isim_verilen_suclama":"evet|hayir","isim_verilen_suclama_gerekce":""}')
 
+# Tool use şeması — Claude'un çıktısını serbest metin JSON yerine yapılandırılmış/şema-doğrulamalı döndürmesini zorlar.
+CLAUDE_TOOL = {
+    "name": "fact_check_raporu",
+    "description": "Doğruluk denetimi analizini bu araca yazarak döndür. Tüm zorunlu alanları doldur; tereddütte siniflandirma='dogrulanamaz', isim_verilen_suclama='evet'.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "ozet": {"type": "string", "description": "4-6 cümle, bağlamlı nötr özet"},
+            "genel_degerlendirme": {"type": "string", "description": "Gelişmiş, çok paragraflı, insani ve edebî değerlendirme"},
+            "baslik_en": {"type": "string"},
+            "ozet_en": {"type": "string"},
+            "genel_degerlendirme_en": {"type": "string"},
+            "medya_kategori": {"type": "string", "enum": ["kara_propaganda", "dezenformasyon", "manipulatif", "dogrulanmamis", "kabul_edilebilir"]},
+            "kategori_gerekce": {"type": "string"},
+            "halk_tabiri": {"type": "string", "description": "Amiyane 2-4 kelime; sorun yoksa boş"},
+            "araclastirma": {"type": "string", "description": "2-4 cümle veya boş"},
+            "haber_sorunu": {"type": "array", "items": {"type": "string", "enum": ["yalan_haber", "iftira", "toptan_suclama", "carpitma", "sorun_yok"]}},
+            "ihlal_edilen_haklar": {"type": "array", "items": {"type": "string", "enum": ["ozel_hayat", "din_vicdan", "orgutlenme", "masumiyet", "adil_yargilanma", "kanunsuz_ceza", "ifade", "ayrimcilik", "kisi_hurriyeti", "seref_itibar"]}},
+            "kanun_maddeleri": {"type": "array", "items": {"type": "object",
+                "properties": {"kanun": {"type": "string"}, "madde": {"type": "string"}, "gerekce": {"type": "string"}},
+                "required": ["kanun", "madde", "gerekce"]}},
+            "iddialar": {"type": "array", "items": {"type": "object",
+                "properties": {"iddia_metni": {"type": "string"},
+                    "siniflandirma": {"type": "string", "enum": ["dogru", "yanlis", "dogrulanamaz", "mesnetsiz", "gorus"]},
+                    "gerekce": {"type": "string", "description": "2-3 cümle: kriter + kanıt"},
+                    "dayanak_kaynak_url": {"type": "string", "description": "Yalnızca tam http(s) URL; yoksa boş"}},
+                "required": ["iddia_metni", "siniflandirma", "gerekce", "dayanak_kaynak_url"]}},
+            "isim_verilen_suclama": {"type": "string", "enum": ["evet", "hayir"]},
+            "isim_verilen_suclama_gerekce": {"type": "string"},
+        },
+        "required": ["ozet", "genel_degerlendirme", "medya_kategori", "kategori_gerekce", "haber_sorunu", "iddialar", "isim_verilen_suclama"],
+    },
+}
+
+_PARAM_BOL = re.compile(r'</parameter>\s*<parameter\s+name="([a-z0-9_]+)"\s*>', re.IGNORECASE)
+
+def _parametre_onar(d):
+    """Model bazen tool alanlarını XML <parameter name=...> etiketleriyle tek bir string'e sızdırır.
+    Bu etiketleri ayıklayıp içerikleri doğru (boş) alanlara dağıtır; kalan artıkları temizler."""
+    if not isinstance(d, dict):
+        return d
+    for anahtar in list(d.keys()):
+        deger = d.get(anahtar)
+        if not isinstance(deger, str) or "<parameter name=" not in deger:
+            continue
+        parcalar = _PARAM_BOL.split(deger)  # [ilk, ad1, icerik1, ad2, icerik2, ...]
+        d[anahtar] = parcalar[0].split("</parameter>")[0].strip()
+        i = 1
+        while i + 1 < len(parcalar):
+            ad, icerik = parcalar[i], parcalar[i + 1]
+            icerik = re.split(r'</parameter>|<parameter\s+name=', icerik)[0].strip()
+            if ad in d and not str(d.get(ad) or "").strip():
+                d[ad] = icerik
+            i += 2
+    for k, v in list(d.items()):  # kalan artık etiketleri temizle
+        if isinstance(v, str) and ("parameter>" in v or "<parameter name=" in v):
+            d[k] = re.sub(r'</?parameter[^>]*>', '', v).strip()
+    return d
+
+def _tool_input(data):
+    """Anthropic yanıtından yapılandırılmış çıktıyı al: önce tool_use bloğu, yoksa metin JSON'a düş (geriye dönük uyum)."""
+    for block in data.get("content", []):
+        if block.get("type") == "tool_use" and isinstance(block.get("input"), dict):
+            return _parametre_onar(block["input"])
+    for block in data.get("content", []):
+        if block.get("type") == "text" and block.get("text", "").strip():
+            return _parametre_onar(_ilk_json(block["text"]))
+    raise ValueError("Yanıtta tool_use veya metin bulunamadı")
+
 def _ilk_json(t):
     """Metindeki İLK tam JSON nesnesini ayıkla; sonrasındaki fazla içeriği yok say (Extra data hatasına dayanıklı)."""
     i = t.find("{")
@@ -205,6 +274,31 @@ def _ilk_json(t):
         m = re.search(r"\{.*\}", t, re.DOTALL)   # son çare: greedy
         if not m: raise ValueError("Geçerli JSON yok")
         return json.loads(m.group(0))
+
+def _anthropic_post(payload, key, timeout=300, tries=4):
+    """Anthropic Messages API çağrısı — 429/5xx/overloaded (529) için exponential backoff ile yeniden dener."""
+    body = json.dumps(payload).encode()
+    last = None
+    for i in range(tries):
+        try:
+            req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
+                headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
+            return json.loads(urllib.request.urlopen(req, timeout=timeout).read())
+        except urllib.error.HTTPError as e:
+            last = e
+            if e.code in (408, 409, 429, 500, 502, 503, 529) and i < tries - 1:
+                wait = 2 ** i * 3
+                print(f"    (Anthropic {e.code} — {wait}s sonra yeniden denenecek [{i+1}/{tries}])")
+                time.sleep(wait); continue
+            raise
+        except (urllib.error.URLError, TimeoutError) as e:
+            last = e
+            if i < tries - 1:
+                wait = 2 ** i * 3
+                print(f"    (Anthropic ağ hatası — {wait}s sonra yeniden denenecek [{i+1}/{tries}])")
+                time.sleep(wait); continue
+            raise
+    raise last
 
 def resolve(u):
     """Yönlendirme linklerini (grounding redirect + Google News RSS) gerçek mecra URL'sine çöz."""
@@ -219,16 +313,35 @@ def resolve(u):
         return u
     except Exception: return u
 
-def claude_analyze(baslik, metin, brief, key, model, mecralar=None):
+def _rag_baglam(baslik, metin):
+    """RAG referans arşivinden ilgili bağlamı getir. HIBRIT_RAG=1 ile açılır; hata olursa boş döner."""
+    if os.environ.get("HIBRIT_RAG", "0") != "1":
+        return ""
+    try:
+        rag_dir = os.path.join(HERE, "..", "rag")
+        if rag_dir not in sys.path:
+            sys.path.insert(0, rag_dir)
+        import rag as _rag
+        return _rag.pipeline_baglam(baslik, metin)
+    except Exception as e:
+        print(f"    (RAG bağlamı atlandı: {e})")
+        return ""
+
+def claude_analyze(baslik, metin, brief, key, model, mecralar=None, ek_baglam=""):
     mec = ""
     if mecralar:
         mec = f"\n\nMECRALAR ({len(mecralar)} mecrada yer aldı): {', '.join(mecralar)}"
-    body = json.dumps({"model": model, "max_tokens": 8000, "system": CLAUDE_SYS,
-        "messages": [{"role": "user", "content": f"BAŞLIK: {baslik}\n\nHABER BAĞLAMI: {metin}{mec}\n\n=== ARAŞTIRMA BRİFİ (Gemini) ===\n{brief}"}]}).encode()
-    req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
-        headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
-    data = json.loads(urllib.request.urlopen(req, timeout=300).read())  # Opus derin yazım uzun sürebilir
-    return _ilk_json(data["content"][0]["text"])
+    ek = f"\n\n{ek_baglam}" if ek_baglam else ""
+    # System prompt uzun ve her haberde aynı → prompt caching ile tekrar tekrar okutmuyoruz (maliyet/gecikme düşer).
+    # System prompt uzun ve her haberde aynı → prompt caching ile tekrar tekrar okutmuyoruz (maliyet/gecikme düşer).
+    # tool_choice ile şema zorunlu: çıktı serbest metin JSON yerine doğrulanmış yapılandırılmış nesne olarak gelir.
+    payload = {"model": model, "max_tokens": 8000,
+        "system": [{"type": "text", "text": CLAUDE_SYS, "cache_control": {"type": "ephemeral"}}],
+        "tools": [CLAUDE_TOOL],
+        "tool_choice": {"type": "tool", "name": "fact_check_raporu"},
+        "messages": [{"role": "user", "content": f"BAŞLIK: {baslik}\n\nHABER BAĞLAMI: {metin}{mec}\n\n=== ARAŞTIRMA BRİFİ (Gemini) ===\n{brief}{ek}"}]}
+    data = _anthropic_post(payload, key, timeout=300)  # Opus derin yazım uzun sürebilir
+    return _tool_input(data)
 
 PROOF_SYS = (
 "Sen titiz bir Türkçe düzeltmen/editörsün. Sana bir doğruluk denetimi raporunun JSON çıktısı verilecek. "
@@ -242,11 +355,9 @@ PROOF_SYS = (
 def claude_proofread(analiz, key, model):
     """İkinci geçiş: yalnızca Türkçe dil düzeltme. Yapısal alanlar orijinalden korunur (güvenli merge)."""
     try:
-        body = json.dumps({"model": model, "max_tokens": 8000, "system": PROOF_SYS,
-            "messages": [{"role": "user", "content": "Şu raporun metinlerini düzelt:\n" + json.dumps(analiz, ensure_ascii=False)}]}).encode()
-        req = urllib.request.Request("https://api.anthropic.com/v1/messages", data=body,
-            headers={"x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json"})
-        data = json.loads(urllib.request.urlopen(req, timeout=180).read())
+        payload = {"model": model, "max_tokens": 8000, "system": PROOF_SYS,
+            "messages": [{"role": "user", "content": "Şu raporun metinlerini düzelt:\n" + json.dumps(analiz, ensure_ascii=False)}]}
+        data = _anthropic_post(payload, key, timeout=180)
         d = _ilk_json(data["content"][0]["text"])
     except Exception as e:
         print(f"    (dil düzeltmesi atlandı: {e})"); return analiz
@@ -270,8 +381,22 @@ def claude_proofread(analiz, key, model):
             if isinstance(fix, dict) and isinstance(fix.get("gerekce"), str) and fix["gerekce"].strip(): orig["gerekce"] = fix["gerekce"]
     return out
 
+def _temiz_metin(s):
+    """Model bazen JSON string değerine sözde-XML etiketi sızdırır (</ozet>, <parameter name=...>).
+    Bu tür artıkları temizler."""
+    s = str(s or "")
+    s = re.split(r"</?ozet>|<parameter\s+name=", s, 1)[0]  # ilk sızıntı etiketinden kes
+    s = re.sub(r"</?[a-zA-Z_][^>]{0,60}>", "", s)          # kalan stray etiketler
+    return s.strip()
+
 def wp_create(title, analiz, kaynaklar):
     valid = {"dogru","yanlis","dogrulanamaz","mesnetsiz","gorus"}  # kismen_dogru kullanılmıyor
+    # Etiket sızıntısı koruması: ozet içine genel_degerlendirme yapışmışsa ayır
+    _oz = str(analiz.get("ozet","")); _tag = '<parameter name="genel_degerlendirme">'
+    if _tag in _oz and not str(analiz.get("genel_degerlendirme","")).strip():
+        analiz["genel_degerlendirme"] = _oz.split(_tag, 1)[1]
+    for _f in ("ozet","genel_degerlendirme","araclastirma","kategori_gerekce","ozet_en","genel_degerlendirme_en"):
+        if analiz.get(_f): analiz[_f] = _temiz_metin(analiz[_f])
     sorunlar = {"yalan_haber","iftira","toptan_suclama","carpitma","sorun_yok"}
     iddialar = [{"iddia_metni": str(x.get("iddia_metni",""))[:2000],
                  "siniflandirma": x.get("siniflandirma") if x.get("siniflandirma") in valid else "dogrulanamaz",
@@ -341,8 +466,9 @@ def process_one(baslik, metin, kaynaklar=None):
                  "ancak iftira, çarpıtma, toptan suçlama gibi ÇERÇEVE/SUNUM sorunları metnin kendisinden tespit "
                  "edilebilir. Kaynak listesi boş.)")
         sources = []
+    ek_baglam = _rag_baglam(baslik, metin)  # HIBRIT_RAG=1 ise RAG arşivinden referans
     try:
-        analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL, mecralar)
+        analiz = claude_analyze(baslik, metin, brief, CKEY, CMODEL, mecralar, ek_baglam)
     except Exception as e:
         print(f"    ✗ Claude hata: {e}"); return None
     if not analiz.get("iddialar"):
@@ -366,12 +492,56 @@ def process_one(baslik, metin, kaynaklar=None):
     print(f"    ✓ taslak ID={pid} | mecra={len(mecralar) or len(kaynaklar)} | sorun={analiz.get('haber_sorunu')} | iddia={len(analiz.get('iddialar', []))}")
     return pid
 
+def _haber_getir(url):
+    """Bir haber URL'sinden başlık + ana metin çıkar (trafilatura + yedekler)."""
+    try:
+        import trafilatura
+    except ImportError:
+        sys.exit("HATA: trafilatura gerekli: pip install trafilatura --break-system-packages")
+    html = None
+    try:
+        html = trafilatura.fetch_url(url)
+    except Exception:
+        html = None
+    if not html:
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent":
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+                "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"})
+            html = urllib.request.urlopen(req, timeout=25).read().decode("utf-8", "ignore")
+        except Exception as e:
+            print(f"    URL getirilemedi: {e}"); return "", ""
+    metin = trafilatura.extract(html, include_comments=False, include_tables=False) or ""
+    baslik = ""
+    try:
+        md = trafilatura.extract_metadata(html)
+        baslik = (getattr(md, "title", "") or "") if md else ""
+    except Exception:
+        baslik = ""
+    if not baslik:
+        m = re.search(r"<title[^>]*>(.*?)</title>", html or "", re.I | re.S)
+        if m:
+            baslik = re.sub(r"\s+", " ", m.group(1)).strip()
+    return baslik.strip(), metin.strip()
+
+
 def main():
     if not (GKEY and CKEY and APP): print("HATA: GEMINI_API_KEY, ANTHROPIC_API_KEY, WP_APP_PASS gerekli."); sys.exit(1)
 
     # Tek haber modu (argümanla)
     if len(sys.argv) > 1:
-        process_one(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else "")
+        arg = sys.argv[1].strip()
+        if arg.startswith("http://") or arg.startswith("https://"):
+            # LİNK MODU: makaleyi çek, başlık+metni çıkar, kaynağı ekleyerek analiz et
+            print(f"  LİNK: {arg}")
+            baslik, metin = _haber_getir(arg)
+            if len(metin.split()) < 40:
+                print("    ✗ Makale metni çekilemedi (JS ile yükleniyor olabilir) — başlığı elle verip deneyin."); sys.exit(1)
+            print(f"    ✓ çekildi: {baslik[:75]}  ({len(metin.split())} kelime)")
+            mecra = urllib.parse.urlparse(arg).netloc.replace("www.", "")
+            process_one(baslik or arg, metin, [{"kaynak_adi": mecra, "orijinal_url": arg, "yayin_tarihi": ""}])
+        else:
+            process_one(arg, sys.argv[2] if len(sys.argv) > 2 else "")
         return
 
     # GÜNLÜK TOPLU MOD: Google News -> dedup -> ilk N haberi işle (aralıklı)
